@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "gallery": "Gallery",
+    "contact": "Contact",
+    "booking": "Book a table"
+  },
+  "hero": {
+    "booking": "Book a table",
+    "menu": "Menu"
+  },
+  "menu": {
+    "title": "Our menu",
+    "all": "All dishes",
+    "emptyCategory": "No dishes in this category."
+  },
+  "booking": {
+    "title": "Reserve a Table",
+    "eyebrow": "Online Booking",
+    "step1Label": "Details",
+    "step2Label": "Contact",
+    "date": "Date",
+    "guests": "Guests",
+    "time": "Time",
+    "person": "guest",
+    "persons": "guests",
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "comment": "Requests",
+    "commentPlaceholder": "Allergies, special requests...",
+    "optional": "optional",
+    "edit": "Edit",
+    "next": "Next",
+    "submit": "Book Now",
+    "sending": "Sending...",
+    "guestsLabel": "guests",
+    "newBooking": "New Booking",
+    "success": "You're booked!",
+    "successMessage": "We will contact you for confirmation.",
+    "error": "Error. Please try again.",
+    "privacyNote": "By clicking \"Book Now\", you agree to the terms and conditions."
+  },
+"contact": {
+  "eyebrow": "Contact Us",
+  "title": "Contact",
+  "address": "Address",
+  "phone": "Phone",
+  "email": "Email",
+  "hours": "Working Hours",
+  "maps": "Open in Google Maps"
+},
+  "footer": {
+    "admin": "Admin panel"
+  }
+}

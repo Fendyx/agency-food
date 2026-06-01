@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "menu": "Speisekarte",
+    "gallery": "Galerie",
+    "contact": "Kontakt",
+    "booking": "Reservieren"
+  },
+  "hero": {
+    "booking": "Tisch reservieren",
+    "menu": "Speisekarte"
+  },
+  "menu": {
+    "title": "Unsere Speisekarte",
+    "all": "Alle Gerichte",
+    "emptyCategory": "Keine Gerichte in dieser Kategorie."
+  },
+  "booking": {
+    "title": "Tisch reservieren",
+  "eyebrow": "Online-Reservierung",
+  "step1Label": "Details",
+  "step2Label": "Kontakt",
+  "date": "Datum",
+  "guests": "Gäste",
+  "time": "Uhrzeit",
+  "person": "Gast",
+  "persons": "Gäste",
+  "name": "Name",
+  "phone": "Telefon",
+  "email": "E-Mail",
+  "comment": "Wünsche",
+  "commentPlaceholder": "Allergien, besondere Wünsche...",
+  "optional": "optional",
+  "edit": "Ändern",
+  "next": "Weiter",
+  "submit": "Reservieren",
+  "sending": "Wird gesendet...",
+  "guestsLabel": "Gäste",
+  "newBooking": "Neue Reservierung",
+  "success": "Erfolgreich gebucht!",
+  "successMessage": "Wir werden Sie zur Bestätigung kontaktieren.",
+  "error": "Fehler. Bitte versuchen Sie es erneut.",
+  "privacyNote": "Mit dem Klick auf „Reservieren“ stimmen Sie den Bedingungen zu."
+},
+  "contact": {
+  "eyebrow": "Kontaktieren Sie uns",
+  "title": "Kontakt",
+  "address": "Adresse",
+  "phone": "Telefon",
+  "email": "E-Mail",
+  "hours": "Öffnungszeiten",
+  "maps": "In Google Maps öffnen"
+},
+  "footer": {
+    "admin": "Verwaltung"
+  }
+}

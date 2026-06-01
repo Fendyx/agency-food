@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "Główna",
+    "menu": "Menu",
+    "gallery": "Galeria",
+    "contact": "Kontakt",
+    "booking": "Zarezerwuj"
+  },
+  "hero": {
+    "booking": "Zarezerwuj stolik",
+    "menu": "Zobacz menu"
+  },
+  "menu": {
+    "title": "Nasze menu",
+    "all": "Wszystkie dania",
+    "emptyCategory": "Brak dań w tej kategorii."
+  },
+  "booking": {
+    "title": "Zarezerwuj stolik",
+    "eyebrow": "Rezerwacja online",
+    "step1Label": "Szczegóły",
+    "step2Label": "Kontakt",
+    "date": "Data",
+    "guests": "Goście",
+    "time": "Godzina",
+    "person": "gość",
+    "persons": "gości",
+    "name": "Imię",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "comment": "Uwagi",
+    "commentPlaceholder": "Alergie, specjalne życzenia...",
+    "optional": "opcjonalnie",
+    "edit": "Zmień",
+    "next": "Dalej",
+    "submit": "Zarezerwuj",
+    "sending": "Wysyłanie...",
+    "guestsLabel": "gości",
+    "newBooking": "Nowa rezerwacja",
+    "success": "Zarezerwowano!",
+    "successMessage": "Skontaktujemy się z Tobą w celu potwierdzenia.",
+    "error": "Błąd. Spróbuj ponownie.",
+    "privacyNote": "Klikając „Zarezerwuj”, akceptujesz regulamin."
+  },
+  "contact": {
+    "eyebrow": "Skontaktuj się z nami",
+    "title": "Kontakt",
+    "address": "Adres",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "hours": "Godziny otwarcia",
+    "maps": "Otwórz w Google Maps"
+  },
+  "footer": {
+    "admin": "Panel administracyjny"
+  }
+}
