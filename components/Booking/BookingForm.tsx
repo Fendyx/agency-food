@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { siteConfig } from '@/site.config'
 
 /* ─── Time slots: 12:00–22:00 every 30 min ─────────────────────── */
@@ -18,6 +18,7 @@ type Step = 1 | 2
 
 export default function BookingForm() {
   const t = useTranslations('booking')
+  const locale = useLocale()                      // ← добавлено
 
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState({
@@ -65,7 +66,7 @@ export default function BookingForm() {
 
             {/* Booking summary */}
             <div className="bg-surface-hover rounded-xl p-4 text-left space-y-2">
-              <SummaryRow icon={<IconCalendar size={14} />} value={formatDate(form.date)} />
+              <SummaryRow icon={<IconCalendar size={14} />} value={formatDate(form.date, locale)} />
               <SummaryRow icon={<IconClock size={14} />} value={form.time} />
               <SummaryRow icon={<IconPeople size={14} />} value={`${form.guests} ${t('guestsLabel')}`} />
               <SummaryRow icon={<IconUser size={14} />} value={form.name} />
@@ -182,7 +183,7 @@ export default function BookingForm() {
 
               {/* Booking summary pill */}
               <div className="flex flex-wrap items-center gap-2 p-3 bg-surface-hover rounded-xl mb-2">
-                <Chip icon={<IconCalendar size={12} />} text={formatDate(form.date)} />
+                <Chip icon={<IconCalendar size={12} />} text={formatDate(form.date, locale)} />
                 <Chip icon={<IconClock size={12} />} text={form.time} />
                 <Chip icon={<IconPeople size={12} />} text={`${form.guests} ${t('guestsLabel')}`} />
                 <button
@@ -374,8 +375,8 @@ const inputCls =
   'w-full h-11 px-4 bg-surface-hover border border-border rounded-xl text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors'
 
 /* ─── Format date ───────────────────────────────────────────────── */
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   if (!dateStr) return ''
   const d = new Date(dateStr + 'T00:00:00')
-  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+  return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
 }

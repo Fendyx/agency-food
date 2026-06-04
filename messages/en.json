@@ -137,24 +137,26 @@
       }
     },
     "reservationsPage": {
-      "loading": "Loading...",
-      "title": "Reservations",
-      "empty": "No reservations yet.",
-      "name": "Name",
-      "date": "Date",
-      "time": "Time",
-      "guests": "Guests",
-      "status": "Status",
-      "actions": "Actions",
-      "confirm": "Confirm",
-      "reject": "Reject",
-      "cancel": "Cancel",
-      "statusLabels": {
-        "pending": "New",
-        "confirmed": "Confirmed",
-        "cancelled": "Cancelled"
-      }
-    },
+  "loading": "Loading...",
+  "title": "Reservations",
+  "empty": "No reservations.",
+  "name": "Name",
+  "date": "Date",
+  "time": "Time",
+  "guests": "Guests",
+  "status": "Status",
+  "actions": "Actions",
+  "confirm": "Confirm",
+  "reject": "Reject",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "deleteConfirm": "Are you sure you want to delete this reservation?",
+  "statusLabels": {
+    "pending": "New",
+    "confirmed": "Confirmed",
+    "cancelled": "Cancelled"
+  }
+},
     "galleryPage": {
       "loading": "Loading...",
       "title": "Gallery",

@@ -51,6 +51,15 @@ export default function ReservationsPage() {
     fetchReservations()
   }
 
+  const deleteReservation = async (id: string) => {
+    if (!confirm(t('deleteConfirm'))) return
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/saas/reservations/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    fetchReservations()
+  }
+
   const statusLabel = (status: string) => {
     const labels: Record<string, string> = {
       pending: t('statusLabels.pending'),
@@ -93,15 +102,10 @@ export default function ReservationsPage() {
                   <tr key={r._id} className="hover:bg-surface-hover transition-colors group">
                     <td className="px-6 py-4">
                       <div className="font-medium text-text-primary">{r.name}</div>
-                      {/* Вывод телефона мелким шрифтом для удобства связи */}
                       {r.phone && <div className="text-xs text-text-tertiary mt-0.5">{r.phone}</div>}
                     </td>
-                    <td className="px-6 py-4 text-sm text-text-secondary">
-                      {r.date}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-text-secondary">
-                      {r.time}
-                    </td>
+                    <td className="px-6 py-4 text-sm text-text-secondary">{r.date}</td>
+                    <td className="px-6 py-4 text-sm text-text-secondary">{r.time}</td>
                     <td className="px-6 py-4 text-sm text-text-secondary">
                       <span className="inline-flex items-center justify-center bg-surface-page border border-border rounded-lg px-2.5 py-1 font-medium">
                         {r.guests}
@@ -120,34 +124,50 @@ export default function ReservationsPage() {
                         {statusLabel(r.status)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 flex gap-2 items-center">
-                      {r.status === 'pending' && (
-                        <>
-                          <button
-                            onClick={() => updateStatus(r._id, 'confirmed')}
-                            className="px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20"
-                          >
-                            {t('confirm')}
-                          </button>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2 items-center">
+                        {/* Кнопки изменения статуса */}
+                        {r.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => updateStatus(r._id, 'confirmed')}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20"
+                            >
+                              {t('confirm')}
+                            </button>
+                            <button
+                              onClick={() => updateStatus(r._id, 'cancelled')}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 transition-colors dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20"
+                            >
+                              {t('reject')}
+                            </button>
+                          </>
+                        )}
+                        {r.status === 'confirmed' && (
                           <button
                             onClick={() => updateStatus(r._id, 'cancelled')}
-                            className="px-3 py-1.5 rounded-lg text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 transition-colors dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20"
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium text-text-secondary bg-surface-page border border-border hover:bg-surface-hover hover:text-rose-600 transition-colors"
                           >
-                            {t('reject')}
+                            {t('cancel')}
                           </button>
-                        </>
-                      )}
-                      {r.status === 'confirmed' && (
+                        )}
+                        {r.status === 'cancelled' && (
+                          <span className="text-text-tertiary text-sm px-3">—</span>
+                        )}
+
+                        {/* Кнопка удаления (для всех) */}
                         <button
-                          onClick={() => updateStatus(r._id, 'cancelled')}
-                          className="px-3 py-1.5 rounded-lg text-xs font-medium text-text-secondary bg-surface-page border border-border hover:bg-surface-hover hover:text-rose-600 transition-colors"
+                          onClick={() => deleteReservation(r._id)}
+                          title={t('delete')}
+                          className="p-1.5 rounded-lg text-text-tertiary hover:text-rose-600 hover:bg-rose-50 transition-colors"
                         >
-                          {t('cancel')}
+                          {/* Иконка корзины */}
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M2 4h10l-1 9H3L2 4z" />
+                            <path d="M5 4V2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2" />
+                          </svg>
                         </button>
-                      )}
-                      {r.status === 'cancelled' && (
-                        <span className="text-text-tertiary text-sm px-3">—</span>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}

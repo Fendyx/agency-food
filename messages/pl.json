@@ -136,24 +136,26 @@
       }
     },
     "reservationsPage": {
-      "loading": "Ładowanie...",
-      "title": "Rezerwacje",
-      "empty": "Brak rezerwacji.",
-      "name": "Imię",
-      "date": "Data",
-      "time": "Czas",
-      "guests": "Goście",
-      "status": "Status",
-      "actions": "Akcje",
-      "confirm": "Potwierdź",
-      "reject": "Odrzuć",
-      "cancel": "Anuluj",
-      "statusLabels": {
-        "pending": "Nowa",
-        "confirmed": "Potwierdzona",
-        "cancelled": "Anulowana"
-      }
-    },
+  "loading": "Ładowanie...",
+  "title": "Rezerwacje",
+  "empty": "Brak rezerwacji.",
+  "name": "Imię",
+  "date": "Data",
+  "time": "Czas",
+  "guests": "Goście",
+  "status": "Status",
+  "actions": "Akcje",
+  "confirm": "Potwierdź",
+  "reject": "Odrzuć",
+  "cancel": "Anuluj",
+  "delete": "Usuń",
+  "deleteConfirm": "Czy na pewno usunąć tę rezerwację?",
+  "statusLabels": {
+    "pending": "Nowa",
+    "confirmed": "Potwierdzona",
+    "cancelled": "Anulowana"
+  }
+},
     "galleryPage": {
       "loading": "Ładowanie...",
       "title": "Galeria",
