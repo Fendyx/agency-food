@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 type Reservation = {
   _id: string
@@ -15,6 +16,7 @@ type Reservation = {
 }
 
 export default function ReservationsPage() {
+  const t = useTranslations('admin.reservationsPage')
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const token = typeof window !== 'undefined' ? localStorage.getItem('saas_token') : null
@@ -49,79 +51,109 @@ export default function ReservationsPage() {
     fetchReservations()
   }
 
-  if (loading) return <div className="text-center py-10">Загрузка...</div>
+  const statusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      pending: t('statusLabels.pending'),
+      confirmed: t('statusLabels.confirmed'),
+      cancelled: t('statusLabels.cancelled'),
+    }
+    return labels[status] || status
+  }
+
+  if (loading) {
+    return <div className="text-center py-16 text-text-secondary">{t('loading')}</div>
+  }
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Бронирования</h2>
+    <div className="max-w-6xl mx-auto pb-12">
+      <h2 className="text-2xl font-heading font-semibold text-text-primary mb-8">
+        {t('title')}
+      </h2>
+
       {reservations.length === 0 ? (
-        <p className="text-zinc-500">Пока нет бронирований.</p>
+        <div className="text-center py-16 px-4 bg-surface-card rounded-2xl border border-dashed border-border">
+          <p className="text-text-secondary">{t('empty')}</p>
+        </div>
       ) : (
-        <div className="overflow-x-auto bg-white rounded shadow">
-          <table className="w-full text-left">
-            <thead className="bg-zinc-100">
-              <tr>
-                <th className="p-3">Имя</th>
-                <th className="p-3">Дата</th>
-                <th className="p-3">Время</th>
-                <th className="p-3">Гостей</th>
-                <th className="p-3">Статус</th>
-                <th className="p-3">Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reservations.map((r) => (
-                <tr key={r._id} className="border-t">
-                  <td className="p-3">{r.name}</td>
-                  <td className="p-3">{r.date}</td>
-                  <td className="p-3">{r.time}</td>
-                  <td className="p-3">{r.guests}</td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        r.status === 'confirmed'
-                          ? 'bg-green-100 text-green-800'
-                          : r.status === 'cancelled'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {r.status === 'pending' ? 'Новый' : r.status === 'confirmed' ? 'Подтверждён' : 'Отклонён'}
-                    </span>
-                  </td>
-                  <td className="p-3 flex gap-2">
-                    {r.status === 'pending' && (
-                      <>
-                        <button
-                          onClick={() => updateStatus(r._id, 'confirmed')}
-                          className="text-green-600 hover:underline text-sm"
-                        >
-                          Подтв.
-                        </button>
+        <div className="bg-surface-card rounded-2xl shadow-card border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left whitespace-nowrap">
+              <thead className="bg-surface-page border-b border-border">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{t('name')}</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{t('date')}</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{t('time')}</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{t('guests')}</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{t('status')}</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{t('actions')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-light">
+                {reservations.map((r) => (
+                  <tr key={r._id} className="hover:bg-surface-hover transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-text-primary">{r.name}</div>
+                      {/* Вывод телефона мелким шрифтом для удобства связи */}
+                      {r.phone && <div className="text-xs text-text-tertiary mt-0.5">{r.phone}</div>}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-text-secondary">
+                      {r.date}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-text-secondary">
+                      {r.time}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-text-secondary">
+                      <span className="inline-flex items-center justify-center bg-surface-page border border-border rounded-lg px-2.5 py-1 font-medium">
+                        {r.guests}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+                          r.status === 'confirmed'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                            : r.status === 'cancelled'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20'
+                            : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
+                        }`}
+                      >
+                        {statusLabel(r.status)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 flex gap-2 items-center">
+                      {r.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => updateStatus(r._id, 'confirmed')}
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20"
+                          >
+                            {t('confirm')}
+                          </button>
+                          <button
+                            onClick={() => updateStatus(r._id, 'cancelled')}
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 transition-colors dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20"
+                          >
+                            {t('reject')}
+                          </button>
+                        </>
+                      )}
+                      {r.status === 'confirmed' && (
                         <button
                           onClick={() => updateStatus(r._id, 'cancelled')}
-                          className="text-red-600 hover:underline text-sm"
+                          className="px-3 py-1.5 rounded-lg text-xs font-medium text-text-secondary bg-surface-page border border-border hover:bg-surface-hover hover:text-rose-600 transition-colors"
                         >
-                          Откл.
+                          {t('cancel')}
                         </button>
-                      </>
-                    )}
-                    {r.status === 'confirmed' && (
-                      <button
-                        onClick={() => updateStatus(r._id, 'cancelled')}
-                        className="text-red-600 hover:underline text-sm"
-                      >
-                        Отменить
-                      </button>
-                    )}
-                    {r.status === 'cancelled' && (
-                      <span className="text-zinc-400 text-sm">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      )}
+                      {r.status === 'cancelled' && (
+                        <span className="text-text-tertiary text-sm px-3">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

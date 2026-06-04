@@ -54,7 +54,7 @@ export default function BookingForm() {
   if (status === 'success') {
     return (
       <Section>
-        <SectionHeader eyebrow={t('eyebrow')} title={t('title')} />
+        <SectionHeader  title={t('title')} />
         <div className="max-w-md mx-auto">
           <div className="bg-surface-card border border-border rounded-2xl p-8 text-center shadow-card">
             <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center mx-auto mb-5">
@@ -85,7 +85,7 @@ export default function BookingForm() {
 
   return (
     <Section>
-      <SectionHeader eyebrow={t('eyebrow')} title={t('title')} />
+      <SectionHeader  title={t('title')} />
 
       <div className="max-w-xl mx-auto">
         {/* ── Step indicator ── */}
@@ -251,16 +251,15 @@ export default function BookingForm() {
 /* ─── Layout helpers ────────────────────────────────────────────── */
 function Section({ children }: { children: React.ReactNode }) {
   return (
-    <section id="booking" className="py-24 bg-surface-page">
+    <section id="booking" className="pt-6 pb-24 bg-surface-page">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">{children}</div>
     </section>
   )
 }
 
-function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
+function SectionHeader({ title }: { title: string }) {
   return (
     <div className="flex flex-col items-center text-center mb-14">
-      <span className="text-[11px] font-semibold tracking-[0.28em] uppercase text-primary mb-4">{eyebrow}</span>
       <h2 className="font-heading text-4xl sm:text-5xl text-text-primary leading-tight">{title}</h2>
       <div className="flex items-center gap-3 mt-5">
         <div className="h-px w-12 bg-border" />

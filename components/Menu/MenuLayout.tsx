@@ -24,6 +24,7 @@ export default function MenuLayout({ items, menuStyle }: { items: MenuItem[]; me
   const locale = useLocale()
   const { settings } = useTenantSettings(siteConfig.tenantId)
   const primaryLanguage = settings?.primaryLanguage || 'pl'
+  const primaryCurrency = settings?.primaryCurrency || 'PLN'
 
   const [categoryMap, setCategoryMap] = useState<Record<string, CategoryData>>({})
 
@@ -129,6 +130,7 @@ export default function MenuLayout({ items, menuStyle }: { items: MenuItem[]; me
                 layout="grid"
                 locale={locale}
                 primaryLanguage={primaryLanguage}
+                primaryCurrency={primaryCurrency}
               />
             ))}
           </div>
@@ -142,6 +144,7 @@ export default function MenuLayout({ items, menuStyle }: { items: MenuItem[]; me
                 layout="list"
                 locale={locale}
                 primaryLanguage={primaryLanguage}
+                primaryCurrency={primaryCurrency}
               />
             ))}
           </div>

@@ -51,7 +51,154 @@
     "hours": "Godziny otwarcia",
     "maps": "Otwórz w Google Maps"
   },
+  "about": {
+    "title": "O nas"
+  },
+  "gallery": {
+  "title": "Galeria",
+  "subtitle": "Nasza restauracja"
+},
   "footer": {
-    "admin": "Panel administracyjny"
+    "admin": "Panel administracyjny",
+    "home": "Główna",
+    "menu": "Menu",
+    "reservations": "Rezerwacje",
+    "contact": "Kontakt",
+    "privacyPolicy": "Polityka prywatności",
+    "terms": "Regulamin",
+    "navigation": "Nawigacja",
+    "legal": "Dokumenty",
+    "poweredBy": "Powered by"
+  },
+  "admin": {
+    "dashboard": "Panel",
+    "menu": "Menu",
+    "gallery": "Galeria",
+    "reservations": "Rezerwacje",
+    "gopublica": "Gopublica",
+    "settings": "Ustawienia",
+    "logout": "Wyloguj się",
+    "loading": "Ładowanie...",
+    "siteManagement": "Zarządzanie stroną",
+    "loginRequired": "Wymagana autoryzacja",
+    "dashboardPage": {
+      "loading": "Ładowanie panelu...",
+      "welcome": "Witaj, {clientName}!",
+      "summary": "Krótki przegląd Twojej strony.",
+      "menuCount": "Dań w menu",
+      "todayReservations": "Rezerwacji dzisiaj",
+      "totalReservations": "Wszystkich rezerwacji",
+      "quickActions": "Szybkie akcje",
+      "manageMenu": "Zarządzaj menu",
+      "reservations": "Rezerwacje",
+      "gallery": "Galeria",
+      "settings": "Ustawienia",
+      "todayBookings": "Dzisiejsze rezerwacje",
+      "noBookings": "Brak rezerwacji na dziś.",
+      "name": "Imię",
+      "time": "Czas",
+      "guests": "Goście",
+      "phone": "Telefon",
+      "statusHeader": "Status",
+      "status": {
+        "pending": "Nowa",
+        "confirmed": "Potwierdzona",
+        "cancelled": "Anulowana"
+      }
+    },
+    "menuManager": {
+      "loading": "Ładowanie menu...",
+      "title": "Menu restauracji «{clientName}»",
+      "addDish": "+ Dodaj danie",
+      "close": "✕ Zamknij",
+      "empty": "Menu jest puste. Dodaj pierwsze danie.",
+      "name": "Nazwa dania",
+      "category": "Kategoria",
+      "selectCategory": "Wybierz kategorię",
+      "customCategory": "Własna kategoria",
+      "categoryName": "Nazwa kategorii",
+      "categoryTranslations": "Tłumaczenia kategorii",
+      "description": "Opis",
+      "price": "Cena",
+      "imageUrl": "URL obrazu",
+      "upload": "Prześlij",
+      "preview": "Podgląd",
+      "dishTranslations": "Tłumaczenia dania (opcjonalnie)",
+      "save": "Zapisz",
+      "add": "Dodaj",
+      "cancel": "Anuluj",
+      "deleteConfirm": "Usunąć danie?",
+      "uploaderNotReady": "Moduł przesyłania jeszcze nie gotowy, spróbuj ponownie za chwilę.",
+      "errorSaveCategory": "Nie udało się zapisać kategorii",
+      "translations": {
+        "name": "Nazwa",
+        "description": "Opis"
+      }
+    },
+    "reservationsPage": {
+      "loading": "Ładowanie...",
+      "title": "Rezerwacje",
+      "empty": "Brak rezerwacji.",
+      "name": "Imię",
+      "date": "Data",
+      "time": "Czas",
+      "guests": "Goście",
+      "status": "Status",
+      "actions": "Akcje",
+      "confirm": "Potwierdź",
+      "reject": "Odrzuć",
+      "cancel": "Anuluj",
+      "statusLabels": {
+        "pending": "Nowa",
+        "confirmed": "Potwierdzona",
+        "cancelled": "Anulowana"
+      }
+    },
+    "galleryPage": {
+      "loading": "Ładowanie...",
+      "title": "Galeria",
+      "addPhoto": "Dodaj zdjęcie",
+      "caption": "Podpis (opcjonalnie)",
+      "selectPhoto": "Wybierz zdjęcie",
+      "addToGallery": "Dodaj do galerii",
+      "empty": "Galeria jest pusta.",
+      "deleteConfirm": "Usunąć zdjęcie?"
+    },
+    "settingsPage": {
+  "loading": "Ładowanie...",
+  "title": "Ustawienia",
+  "phone": "Telefon",
+  "address": "Adres",
+  "email": "Email",
+  "hours": "Godziny otwarcia",
+  "googleMapsUrl": "URL Google Maps",
+  "save": "Zapisz",
+  "saved": "Zapisano!",
+  "primaryLanguage": "Główny język restauracji",
+  "primaryCurrency": "Waluta menu",
+  "contactSection": "Kontakt",
+  "localisationSection": "Lokalizacja",
+  "seoTranslations": "Tłumaczenia SEO",
+  "seoTitleLabel": "Tytuł SEO",
+  "seoDescriptionLabel": "Opis SEO",
+  "hoursTranslations": "Tłumaczenia godzin otwarcia",
+  "notifications": {
+    "title": "Powiadomienia o rezerwacjach",
+    "sound": "Powiadomienie dźwiękowe",
+    "message": "Komunikat wyskakujący",
+    "melody": "Melodia",
+    "default": "Domyślna",
+    "melody1": "Melodia 1",
+    "customUrl": "Własny URL",
+    "listen": "Odsłuchaj"
+  }
+},
+    "gopublicaPage": {
+      "loading": "Ładowanie wiadomości...",
+      "title": "Aktualności od Gopublica",
+      "empty": "Brak wiadomości",
+      "emptyDesc": "Tutaj będą pojawiać się wiadomości i powiadomienia od Twojego dostawcy usług.",
+      "expires": "Ważne do:"
+    }
   }
 }

@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Kin Za', // Позже можно сделать динамическим через siteConfig
+  title: 'Café Oliv', 
   description: 'Restaurant',
 };
 

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { siteConfig } from '@/site.config'
 import { UtensilsCrossed, CalendarCheck, ClipboardList, ArrowRight, Settings, ImageIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 type DashboardData = {
   menuCount: number
@@ -21,6 +22,7 @@ type DashboardData = {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const t = useTranslations('admin.dashboardPage')
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState<string | null>(null)
@@ -46,26 +48,33 @@ export default function DashboardPage() {
       .finally(() => setLoading(false))
   }, [token])
 
-  if (loading) return <div className="text-center py-10">Загрузка дашборда...</div>
+  if (loading) return <div className="text-center py-10">{t('loading')}</div>
 
   const stats = [
-    { label: 'Блюд в меню', value: data?.menuCount ?? 0, icon: UtensilsCrossed },
-    { label: 'Броней сегодня', value: data?.todayReservationsCount ?? 0, icon: CalendarCheck },
-    { label: 'Всего бронирований', value: data?.totalReservationsCount ?? 0, icon: ClipboardList },
+    { label: t('menuCount'), value: data?.menuCount ?? 0, icon: UtensilsCrossed },
+    { label: t('todayReservations'), value: data?.todayReservationsCount ?? 0, icon: CalendarCheck },
+    { label: t('totalReservations'), value: data?.totalReservationsCount ?? 0, icon: ClipboardList },
   ]
 
   const quickLinks = [
-    { label: 'Управлять меню', href: '/admin/menu', icon: UtensilsCrossed },
-    { label: 'Бронирования', href: '/admin/reservations', icon: CalendarCheck },
-    { label: 'Галерея', href: '/admin/gallery', icon: ImageIcon },
-    { label: 'Настройки', href: '/admin/settings', icon: Settings },
+    { label: t('manageMenu'), href: '/admin/menu', icon: UtensilsCrossed },
+    { label: t('reservations'), href: '/admin/reservations', icon: CalendarCheck },
+    { label: t('gallery'), href: '/admin/gallery', icon: ImageIcon },
+    { label: t('settings'), href: '/admin/settings', icon: Settings },
   ]
+
+  const statusLabel = (status: string) => {
+    if (status === 'pending') return t('status.pending')
+    if (status === 'confirmed') return t('status.confirmed')
+    if (status === 'cancelled') return t('status.cancelled')
+    return status
+  }
 
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Добро пожаловать, {siteConfig.clientName}!</h1>
-        <p className="text-text-secondary">Краткая сводка по вашему сайту.</p>
+        <h1 className="text-2xl font-bold">{t('welcome', { clientName: siteConfig.clientName })}</h1>
+        <p className="text-text-secondary">{t('summary')}</p>
       </div>
 
       {/* Карточки статистики */}
@@ -83,7 +92,7 @@ export default function DashboardPage() {
 
       {/* Быстрые ссылки */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold mb-3">Быстрые действия</h2>
+        <h2 className="text-lg font-semibold mb-3">{t('quickActions')}</h2>
         <div className="flex flex-wrap gap-3">
           {quickLinks.map(({ label, href, icon: Icon }) => (
             <button
@@ -100,17 +109,17 @@ export default function DashboardPage() {
 
       {/* Последние бронирования */}
       <div>
-        <h2 className="text-lg font-semibold mb-3">Сегодняшние бронирования</h2>
+        <h2 className="text-lg font-semibold mb-3">{t('todayBookings')}</h2>
         {data?.lastReservations && data.lastReservations.length > 0 ? (
           <div className="bg-white rounded-lg shadow overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-zinc-100">
                 <tr>
-                  <th className="p-3">Имя</th>
-                  <th className="p-3">Время</th>
-                  <th className="p-3">Гостей</th>
-                  <th className="p-3">Телефон</th>
-                  <th className="p-3">Статус</th>
+                  <th className="p-3">{t('name')}</th>
+                  <th className="p-3">{t('time')}</th>
+                  <th className="p-3">{t('guests')}</th>
+                  <th className="p-3">{t('phone')}</th>
+                  <th className="p-3">{t('statusHeader')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -126,7 +135,7 @@ export default function DashboardPage() {
                         r.status === 'cancelled' ? 'bg-red-100 text-red-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {r.status === 'pending' ? 'Новый' : r.status === 'confirmed' ? 'Подтверждён' : 'Отклонён'}
+                        {statusLabel(r.status)}
                       </span>
                     </td>
                   </tr>
@@ -135,7 +144,7 @@ export default function DashboardPage() {
             </table>
           </div>
         ) : (
-          <p className="text-zinc-500">На сегодня бронирований нет.</p>
+          <p className="text-zinc-500">{t('noBookings')}</p>
         )}
       </div>
     </div>

@@ -1,20 +1,60 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { siteConfig } from '@/site.config'
-import ThemeToggle from '@/components/ui/ThemeToggle'
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher'
 import { Menu, X, CalendarDays } from 'lucide-react'
 
 export default function Navbar() {
   const t = useTranslations('nav')
+  const locale = useLocale()
   const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const burgerRef = useRef<HTMLButtonElement>(null)
+
+  // Закрытие меню при клике на свободное место
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        burgerRef.current &&
+        !burgerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isOpen])
+
+  // Закрытие меню по стрелке "назад" браузера
+  useEffect(() => {
+    if (!isOpen) return
+
+    window.history.pushState({ menuOpen: true }, '')
+
+    const handlePopState = () => {
+      setIsOpen(false)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+      // Намеренно НЕ вызываем history.back() здесь —
+      // иначе при клике на любую ссылку навигация отменялась бы.
+      // Фейковый pushState просто остаётся в истории, это безопасно.
+    }
+  }, [isOpen])
 
   const links = [
-    { href: '/', label: t('home') },
-    ...(siteConfig.features.hasMenu ? [{ href: '#menu', label: t('menu') }] : []),
+    { href: `/${locale}`, label: t('home') },
+    ...(siteConfig.features.hasMenu ? [{ href: `/${locale}/menu`, label: t('menu') }] : []),
     ...(siteConfig.features.hasGallery ? [{ href: '#gallery', label: t('gallery') }] : []),
     { href: '#contact', label: t('contact') },
   ]
@@ -26,7 +66,7 @@ export default function Navbar() {
 
           {/* Логотип */}
           <Link
-            href="/"
+            href={`/${locale}`}
             className="font-heading text-xl font-semibold text-text-primary hover:text-primary transition-colors"
           >
             {siteConfig.clientName}
@@ -48,11 +88,10 @@ export default function Navbar() {
           {/* CTA кнопка + переключатели + мобильный бургер */}
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
-            <ThemeToggle />
             
             {siteConfig.features.hasBooking && (
               <Link
-                href="#reservations"
+                href={`/${locale}/reservations`}
                 className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               >
@@ -63,6 +102,7 @@ export default function Navbar() {
 
             {/* Бургер */}
             <button
+              ref={burgerRef}
               onClick={() => setIsOpen(!isOpen)}
               className="md:hidden p-2 rounded-lg text-text-secondary hover:bg-surface-hover transition-colors"
               aria-label="Открыть меню"
@@ -75,7 +115,7 @@ export default function Navbar() {
 
       {/* Мобильное меню */}
       {isOpen && (
-        <div className="md:hidden border-t border-border-light bg-surface-page px-4 py-4 flex flex-col gap-3">
+        <div ref={menuRef} className="md:hidden border-t border-border-light bg-surface-page px-4 py-4 flex flex-col gap-3">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -90,7 +130,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3 mt-2">
             {siteConfig.features.hasBooking && (
               <Link
-                href="#reservations"
+                href={`/${locale}/reservations`}
                 onClick={() => setIsOpen(false)}
                 className="flex-1 text-center px-4 py-2 rounded-lg text-sm font-medium text-white"
                 style={{ backgroundColor: 'var(--color-primary)' }}
@@ -99,7 +139,6 @@ export default function Navbar() {
               </Link>
             )}
             <LanguageSwitcher />
-            <ThemeToggle />
           </div>
         </div>
       )}

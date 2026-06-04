@@ -1,8 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { siteConfig } from '@/site.config'
+import { useTranslations } from 'next-intl'
 
 export default function SettingsPage() {
+  const t = useTranslations('admin.settingsPage')
   const [token, setToken] = useState<string | null>(null)
   const [form, setForm] = useState({
     phone: '',
@@ -14,8 +16,12 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saved, setSaved] = useState(false)
   const [primaryLanguage, setPrimaryLanguage] = useState('pl')
+  const [primaryCurrency, setPrimaryCurrency] = useState('PLN')
 
-  // Состояние для уведомлений
+  const [hoursI18n, setHoursI18n] = useState<Record<string, string>>({})
+  const [seoTitleI18n, setSeoTitleI18n] = useState<Record<string, string>>({})
+  const [seoDescriptionI18n, setSeoDescriptionI18n] = useState<Record<string, string>>({})
+
   const [notifications, setNotifications] = useState({
     booking: {
       sound: true,
@@ -23,6 +29,9 @@ export default function SettingsPage() {
       soundFile: '',
     },
   })
+
+  const SUPPORTED_LANGUAGES = ['pl', 'en', 'de', 'ru', 'es', 'ua']
+  const availableLangs = SUPPORTED_LANGUAGES.filter(lang => lang !== primaryLanguage)
 
   useEffect(() => {
     const savedToken = localStorage.getItem('saas_token')
@@ -35,7 +44,6 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (!token) return
-    // Загружаем текущие настройки
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/saas/settings?tenantId=${siteConfig.tenantId}`)
       .then(res => res.json())
       .then(data => {
@@ -47,6 +55,10 @@ export default function SettingsPage() {
           googleMapsUrl: data.googleMapsUrl || siteConfig.contact.googleMapsUrl || '',
         })
         if (data.primaryLanguage) setPrimaryLanguage(data.primaryLanguage)
+        if (data.primaryCurrency) setPrimaryCurrency(data.primaryCurrency)
+        setHoursI18n(data.hoursI18n || {})
+        setSeoTitleI18n(data.seoTitleI18n || {})
+        setSeoDescriptionI18n(data.seoDescriptionI18n || {})
         if (data.notifications) {
           setNotifications(prev => ({
             ...prev,
@@ -66,6 +78,10 @@ export default function SettingsPage() {
         ...form,
         notifications,
         primaryLanguage,
+        primaryCurrency,
+        hoursI18n,
+        seoTitleI18n,
+        seoDescriptionI18n,
       }
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/saas/settings`, {
         method: 'PUT',
@@ -84,164 +100,315 @@ export default function SettingsPage() {
     }
   }
 
-  if (loading) return <div className="text-center py-10">Загрузка...</div>
+  if (loading)
+    return (
+      <div className="flex items-center justify-center py-20 text-sm text-[var(--color-text-tertiary)]">
+        {t('loading')}
+      </div>
+    )
+
+  const labelCls = 'block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5 uppercase tracking-wide'
+  const inputCls =
+    'w-full bg-[var(--color-surface-page)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm rounded-lg px-3 py-2.5 outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 placeholder:text-[var(--color-text-tertiary)]'
+  const selectCls =
+    'bg-[var(--color-surface-page)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm rounded-lg px-3 py-2.5 outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 w-full max-w-xs'
+  const sectionTitleCls = 'text-xs font-semibold uppercase tracking-widest text-[var(--color-text-tertiary)] mb-4'
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Настройки</h2>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow max-w-2xl space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Телефон</label>
-          <input
-            type="text"
-            value={form.phone}
-            onChange={e => setForm({ ...form, phone: e.target.value })}
-            className="w-full border p-2 rounded mt-1"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Адрес</label>
-          <input
-            type="text"
-            value={form.address}
-            onChange={e => setForm({ ...form, address: e.target.value })}
-            className="w-full border p-2 rounded mt-1"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Email</label>
-          <input
-            type="email"
-            value={form.email}
-            onChange={e => setForm({ ...form, email: e.target.value })}
-            className="w-full border p-2 rounded mt-1"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Часы работы</label>
-          <input
-            type="text"
-            value={form.hours}
-            onChange={e => setForm({ ...form, hours: e.target.value })}
-            className="w-full border p-2 rounded mt-1"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Google Maps URL</label>
-          <input
-            type="text"
-            value={form.googleMapsUrl}
-            onChange={e => setForm({ ...form, googleMapsUrl: e.target.value })}
-            className="w-full border p-2 rounded mt-1"
-          />
+    <div className="max-w-2xl">
+      <h2 className="text-2xl font-semibold text-[var(--color-text-primary)] mb-6">
+        {t('title')}
+      </h2>
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl shadow-[var(--shadow-card)] divide-y divide-[var(--color-border)]"
+      >
+        {/* ── Contact section ─────────────────────────────────────────────── */}
+        <div className="p-6 space-y-4">
+          <p className={sectionTitleCls}>{t('contactSection')}</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>{t('phone')}</label>
+              <input
+                type="text"
+                value={form.phone}
+                onChange={e => setForm({ ...form, phone: e.target.value })}
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>{t('email')}</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>{t('address')}</label>
+            <input
+              type="text"
+              value={form.address}
+              onChange={e => setForm({ ...form, address: e.target.value })}
+              className={inputCls}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>{t('hours')}</label>
+              <input
+                type="text"
+                value={form.hours}
+                onChange={e => setForm({ ...form, hours: e.target.value })}
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>{t('googleMapsUrl')}</label>
+              <input
+                type="text"
+                value={form.googleMapsUrl}
+                onChange={e => setForm({ ...form, googleMapsUrl: e.target.value })}
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          {/* Блок переводов часов работы */}
+          <details className="group border border-[var(--color-border)] rounded-xl bg-[var(--color-surface-page)] overflow-hidden">
+            <summary className="cursor-pointer p-3 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors flex items-center gap-2 list-none [&::-webkit-details-marker]:hidden">
+              <svg className="w-4 h-4 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              {t('hoursTranslations')}
+            </summary>
+            <div className="px-4 pb-4 grid sm:grid-cols-3 gap-3">
+              {availableLangs.map(lang => (
+                <div key={lang}>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-1">{lang}</p>
+                  <input
+                    type="text"
+                    placeholder={`${t('hours')} (${lang})`}
+                    value={hoursI18n[lang] || ''}
+                    onChange={e => setHoursI18n(prev => ({ ...prev, [lang]: e.target.value }))}
+                    className={inputCls}
+                  />
+                </div>
+              ))}
+            </div>
+          </details>
         </div>
 
-        {/* Секция уведомлений */}
-        <div className="border-t pt-6 mt-6">
-          <h3 className="text-lg font-semibold mb-4">Уведомления о бронировании</h3>
+        {/* ── Notifications section ────────────────────────────────────────── */}
+        <div className="p-6 space-y-4">
+          <p className={sectionTitleCls}>{t('notifications.title')}</p>
+
           <div className="space-y-3">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={notifications.booking.sound}
-                onChange={(e) =>
-                  setNotifications({
-                    ...notifications,
-                    booking: { ...notifications.booking, sound: e.target.checked },
-                  })
-                }
-              />
-              <span>Звуковое оповещение</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={notifications.booking.message}
-                onChange={(e) =>
-                  setNotifications({
-                    ...notifications,
-                    booking: { ...notifications.booking, message: e.target.checked },
-                  })
-                }
-              />
-              <span>Всплывающее сообщение</span>
-            </label>
-            <div>
-              <label className="block text-sm font-medium text-zinc-700">Мелодия</label>
-              <select
-                value={notifications.booking.soundFile}
-                onChange={(e) =>
-                  setNotifications({
-                    ...notifications,
-                    booking: { ...notifications.booking, soundFile: e.target.value },
-                  })
-                }
-                className="border p-2 rounded mt-1 w-full max-w-xs"
-              >
-                <option value="">Стандартный (default)</option>
-                <option value="/sounds/1.mp3">Мелодия 1</option>
-                <option value="custom">Свой URL</option>
-              </select>
-              {notifications.booking.soundFile === 'custom' && (
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <span className="relative inline-flex">
                 <input
-                  type="text"
-                  placeholder="Введите URL звукового файла"
-                  value={
-                    notifications.booking.soundFile === 'custom'
-                      ? ''
-                      : notifications.booking.soundFile
+                  type="checkbox"
+                  checked={notifications.booking.sound}
+                  onChange={e =>
+                    setNotifications({
+                      ...notifications,
+                      booking: { ...notifications.booking, sound: e.target.checked },
+                    })
                   }
-                  onChange={(e) =>
+                  className="peer sr-only"
+                />
+                <span className="h-5 w-9 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-page)] transition peer-checked:bg-[var(--color-primary)] peer-checked:border-[var(--color-primary)]" />
+                <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-[var(--color-text-tertiary)] transition peer-checked:translate-x-4 peer-checked:bg-white" />
+              </span>
+              <span className="text-sm text-[var(--color-text-primary)]">{t('notifications.sound')}</span>
+            </label>
+
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <span className="relative inline-flex">
+                <input
+                  type="checkbox"
+                  checked={notifications.booking.message}
+                  onChange={e =>
+                    setNotifications({
+                      ...notifications,
+                      booking: { ...notifications.booking, message: e.target.checked },
+                    })
+                  }
+                  className="peer sr-only"
+                />
+                <span className="h-5 w-9 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-page)] transition peer-checked:bg-[var(--color-primary)] peer-checked:border-[var(--color-primary)]" />
+                <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-[var(--color-text-tertiary)] transition peer-checked:translate-x-4 peer-checked:bg-white" />
+              </span>
+              <span className="text-sm text-[var(--color-text-primary)]">{t('notifications.message')}</span>
+            </label>
+
+            <div className="pt-1">
+              <label className={labelCls}>{t('notifications.melody')}</label>
+              <div className="flex items-center gap-2">
+                <select
+                  value={notifications.booking.soundFile}
+                  onChange={e =>
                     setNotifications({
                       ...notifications,
                       booking: { ...notifications.booking, soundFile: e.target.value },
                     })
                   }
-                  className="border p-2 rounded mt-1 w-full"
+                  className={selectCls}
+                >
+                  <option value="">{t('notifications.default')}</option>
+                  <option value="/sounds/1.mp3">{t('notifications.melody1')}</option>
+                  <option value="custom">{t('notifications.customUrl')}</option>
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const src =
+                      notifications.booking.soundFile &&
+                      notifications.booking.soundFile !== 'custom'
+                        ? notifications.booking.soundFile
+                        : '/sounds/default.mp3'
+                    new Audio(src).play()
+                  }}
+                  className="shrink-0 text-xs font-medium text-[var(--color-primary)] border border-[var(--color-primary)]/30 rounded-lg px-3 py-2.5 hover:bg-[var(--color-primary)]/5 transition"
+                >
+                  {t('notifications.listen')}
+                </button>
+              </div>
+
+              {notifications.booking.soundFile === 'custom' && (
+                <input
+                  type="text"
+                  placeholder={t('notifications.customUrl')}
+                  onChange={e =>
+                    setNotifications({
+                      ...notifications,
+                      booking: { ...notifications.booking, soundFile: e.target.value },
+                    })
+                  }
+                  className={`${inputCls} mt-2`}
                 />
               )}
-              <button
-                type="button"
-                onClick={() => {
-                  const src =
-                    notifications.booking.soundFile && notifications.booking.soundFile !== 'custom'
-                      ? notifications.booking.soundFile
-                      : '/sounds/default.mp3';
-                  new Audio(src).play();
-                }}
-                className="ml-2 text-sm text-blue-600 hover:underline"
-              >
-                Прослушать
-              </button>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button
-            type="submit"
-            className="px-4 py-2 rounded text-white"
-            style={{ backgroundColor: 'var(--color-primary)' }}
-          >
-            Сохранить
-          </button>
-          {saved && <span className="text-green-600 text-sm">Сохранено!</span>}
+        {/* ── Localisation section ─────────────────────────────────────────── */}
+        <div className="p-6">
+          <p className={sectionTitleCls}>{t('localisationSection')}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>{t('primaryLanguage')}</label>
+              <select
+                value={primaryLanguage}
+                onChange={e => setPrimaryLanguage(e.target.value)}
+                className={selectCls}
+              >
+                <option value="pl">Polski</option>
+                <option value="en">English</option>
+                <option value="de">Deutsch</option>
+                <option value="ru">Русский</option>
+                <option value="es">Español</option>
+                <option value="ua">Українська</option>
+              </select>
+            </div>
+
+            <div>
+              <label className={labelCls}>{t('primaryCurrency')}</label>
+              <select
+                value={primaryCurrency}
+                onChange={e => setPrimaryCurrency(e.target.value)}
+                className={selectCls}
+              >
+                <option value="PLN">PLN (zł)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="USD">USD ($)</option>
+                <option value="UAH">UAH (₴)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="CZK">CZK (Kč)</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">Основной язык ресторана</label>
-          <select
-            value={primaryLanguage}
-            onChange={(e) => setPrimaryLanguage(e.target.value)}
-            className="border p-2 rounded mt-1 w-full max-w-xs"
+        {/* ── SEO Translations section ─────────────────────────────────────── */}
+        <div className="p-6 space-y-4">
+          <p className={sectionTitleCls}>{t('seoTranslations')}</p>
+
+          <details className="group border border-[var(--color-border)] rounded-xl bg-[var(--color-surface-page)] overflow-hidden">
+            <summary className="cursor-pointer p-3 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors flex items-center gap-2 list-none [&::-webkit-details-marker]:hidden">
+              <svg className="w-4 h-4 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              {t('seoTitleLabel')}
+            </summary>
+            <div className="px-4 pb-4 grid sm:grid-cols-3 gap-3">
+              {availableLangs.map(lang => (
+                <div key={lang}>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-1">{lang}</p>
+                  <input
+                    type="text"
+                    placeholder={`${t('seoTitleLabel')} (${lang})`}
+                    value={seoTitleI18n[lang] || ''}
+                    onChange={e => setSeoTitleI18n(prev => ({ ...prev, [lang]: e.target.value }))}
+                    className={inputCls}
+                  />
+                </div>
+              ))}
+            </div>
+          </details>
+
+          <details className="group border border-[var(--color-border)] rounded-xl bg-[var(--color-surface-page)] overflow-hidden">
+            <summary className="cursor-pointer p-3 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors flex items-center gap-2 list-none [&::-webkit-details-marker]:hidden">
+              <svg className="w-4 h-4 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              {t('seoDescriptionLabel')}
+            </summary>
+            <div className="px-4 pb-4 grid sm:grid-cols-3 gap-3">
+              {availableLangs.map(lang => (
+                <div key={lang}>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-1">{lang}</p>
+                  <textarea
+                    placeholder={`${t('seoDescriptionLabel')} (${lang})`}
+                    value={seoDescriptionI18n[lang] || ''}
+                    onChange={e => setSeoDescriptionI18n(prev => ({ ...prev, [lang]: e.target.value }))}
+                    className={inputCls}
+                    rows={2}
+                  />
+                </div>
+              ))}
+            </div>
+          </details>
+        </div>
+
+        {/* ── Footer / save ────────────────────────────────────────────────── */}
+        <div className="px-6 py-4 flex items-center justify-between bg-[var(--color-surface-hover)]/40 rounded-b-2xl">
+          <button
+            type="submit"
+            className="px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-[var(--color-primary)] hover:brightness-110 active:brightness-95 transition"
           >
-            <option value="pl">Polski</option>
-            <option value="en">English</option>
-            <option value="de">Deutsch</option>
-            <option value="ru">Русский</option>
-            <option value="es">Español</option>
-            <option value="ua">Українська</option>
-          </select>
+            {t('save')}
+          </button>
+
+          {saved && (
+            <span className="flex items-center gap-1.5 text-sm text-emerald-600 animate-in fade-in duration-300">
+              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {t('saved')}
+            </span>
+          )}
         </div>
       </form>
     </div>

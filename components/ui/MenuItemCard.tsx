@@ -9,6 +9,21 @@ interface MenuItemCardProps {
   onDelete?: (id: string) => void
   locale?: string
   primaryLanguage?: string
+  primaryCurrency?: string
+}
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  PLN: 'zł',
+  EUR: '€',
+  USD: '$',
+  UAH: '₴',
+  GBP: '£',
+  CZK: 'Kč',
+  CHF: 'CHF',
+}
+
+function getCurrencySymbol(currencyCode?: string): string {
+  return currencyCode ? CURRENCY_SYMBOLS[currencyCode] || currencyCode : 'zł'
 }
 
 export default function MenuItemCard({
@@ -19,6 +34,7 @@ export default function MenuItemCard({
   onDelete,
   locale,
   primaryLanguage,
+  primaryCurrency,
 }: MenuItemCardProps) {
 
   const displayName = locale && primaryLanguage
@@ -59,7 +75,7 @@ export default function MenuItemCard({
           </div>
 
           <div className="flex items-center justify-between pt-2 border-t border-border-light">
-            <Price value={item.price} />
+            <Price value={item.price} currency={primaryCurrency} />
             {mode === 'admin' && (
               <AdminActions
                 onEdit={() => onEdit?.(item)}
@@ -110,7 +126,7 @@ export default function MenuItemCard({
         )}
 
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-border-light">
-          <Price value={item.price} />
+          <Price value={item.price} currency={primaryCurrency} />
           {mode === 'admin' && (
             <AdminActions
               onEdit={() => onEdit?.(item)}
@@ -125,12 +141,12 @@ export default function MenuItemCard({
 }
 
 /* ── Sub-components ──────────────────────────────────────────────── */
-
-function Price({ value }: { value: number | string }) {
+function Price({ value, currency }: { value: number | string; currency?: string }) {
+  const symbol = getCurrencySymbol(currency)
   return (
     <span className="font-heading font-bold text-primary text-lg leading-none tracking-tight">
       {value}
-      <span className="text-xs font-medium opacity-70"> zł</span>
+      <span className="text-xs font-medium opacity-70"> {symbol}</span>
     </span>
   )
 }

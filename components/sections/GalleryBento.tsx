@@ -2,10 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { GalleryItem } from '@/types'
 
-/* ─── Grid span pattern (repeats every 7 items) ─────────────────
-   0 → 2×2 (featured)   1 → 1×1   2 → 1×1
-   3 → 1×2 (tall)       4 → 1×1   5 → 1×1   6 → 1×1
-   ──────────────────────────────────────────────────────────── */
+/* ─── Grid span pattern (repeats every 7 items) ───────────────── */
 function getSpan(index: number): string {
   const p = index % 7
   if (p === 0) return 'col-span-2 row-span-2'
@@ -13,7 +10,13 @@ function getSpan(index: number): string {
   return ''
 }
 
-export default function GalleryBento({ images }: { images: GalleryItem[] }) {
+interface GalleryBentoProps {
+  images: GalleryItem[]
+  title: string
+  subtitle: string
+}
+
+export default function GalleryBento({ images, title, subtitle }: GalleryBentoProps) {
   const [lightbox, setLightbox] = useState<number | null>(null)
 
   const close  = useCallback(() => setLightbox(null), [])
@@ -40,6 +43,14 @@ export default function GalleryBento({ images }: { images: GalleryItem[] }) {
 
   if (!images.length) return null
 
+  // Можно также вынести в переводы, оставим пока как есть
+  const photoCountText =
+    images.length === 1
+      ? 'фотография'
+      : images.length < 5
+      ? 'фотографии'
+      : 'фотографий'
+
   return (
     <section id="gallery" className="py-20 bg-surface-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -47,10 +58,10 @@ export default function GalleryBento({ images }: { images: GalleryItem[] }) {
         {/* ── Section header ─────────────────────────────── */}
         <div className="flex flex-col items-center text-center mb-14">
           <span className="text-[11px] font-semibold tracking-[0.28em] uppercase text-primary mb-4">
-            Наш ресторан
+            {subtitle}
           </span>
           <h2 className="font-heading text-4xl sm:text-5xl text-text-primary leading-tight">
-            Галерея
+            {title}
           </h2>
           <div className="flex items-center gap-3 mt-5">
             <div className="h-px w-12 bg-border" />
@@ -77,7 +88,7 @@ export default function GalleryBento({ images }: { images: GalleryItem[] }) {
 
         {/* ── Photo count ─────────────────────────────────── */}
         <p className="text-center text-xs text-text-tertiary mt-6 tracking-wide">
-          {images.length} {images.length === 1 ? 'фотография' : images.length < 5 ? 'фотографии' : 'фотографий'}
+          {images.length} {photoCountText}
         </p>
       </div>
 

@@ -1,23 +1,25 @@
+'use client'
+import { useTenantSettings } from '@/lib/useTenantSettings'
+import { useLocale, useTranslations } from 'next-intl'
 import { siteConfig } from '@/site.config'
-import { getTranslations } from 'next-intl/server'
 
-export default async function HeroSplit() {
-  const t = await getTranslations('hero')
+export default function HeroSplit() {
+  const { settings } = useTenantSettings(siteConfig.tenantId)
+  const locale = useLocale()
+  const t = useTranslations('hero')
 
   return (
     <section className="relative bg-zinc-50 py-20 lg:py-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          
-          {/* Текст */}
           <div className="order-2 lg:order-1">
             <h1 className="text-4xl lg:text-5xl font-bold text-zinc-900 mb-6 leading-tight">
-              {siteConfig.seo.title}
+              {settings.seoTitle}
             </h1>
             <p className="text-lg text-zinc-600 mb-8 leading-relaxed">
-              {siteConfig.seo.description}
+              {settings.seoDescription}
             </p>
-            
+
             <div className="flex flex-wrap gap-4">
               {siteConfig.features.hasBooking && (
                 <a
@@ -40,7 +42,6 @@ export default async function HeroSplit() {
             </div>
           </div>
 
-          {/* Изображение */}
           <div className="order-1 lg:order-2">
             <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
               <img

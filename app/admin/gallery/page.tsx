@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { siteConfig } from '@/site.config'
+import { useTranslations } from 'next-intl'
 
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'твой-cloud-name'
 const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'menu_photos'
@@ -13,6 +14,7 @@ type GalleryItem = {
 }
 
 export default function GalleryAdminPage() {
+  const t = useTranslations('admin.galleryPage')
   const [images, setImages] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState<string | null>(null)
@@ -105,7 +107,7 @@ export default function GalleryAdminPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Удалить изображение?')) return
+    if (!confirm(t('deleteConfirm'))) return
     try {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/saas/gallery/${id}`, {
         method: 'DELETE',
@@ -117,19 +119,19 @@ export default function GalleryAdminPage() {
     }
   }
 
-  if (loading) return <div className="text-center py-10">Загрузка...</div>
+  if (loading) return <div className="text-center py-10">{t('loading')}</div>
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Галерея</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('title')}</h2>
 
       {/* Добавление */}
       <div className="bg-white p-6 rounded shadow mb-8">
-        <h3 className="text-lg font-medium mb-3">Добавить фото</h3>
+        <h3 className="text-lg font-medium mb-3">{t('addPhoto')}</h3>
         <div className="flex gap-4 items-end">
           <input
             type="text"
-            placeholder="Подпись (необязательно)"
+            placeholder={t('caption')}
             value={caption}
             onChange={e => setCaption(e.target.value)}
             className="border p-2 rounded flex-1"
@@ -138,7 +140,7 @@ export default function GalleryAdminPage() {
             onClick={() => cloudinaryWidgetRef.current?.open()}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Выбрать фото
+            {t('selectPhoto')}
           </button>
         </div>
         {imageUrl && (
@@ -149,7 +151,7 @@ export default function GalleryAdminPage() {
               className="px-4 py-2 rounded text-white"
               style={{ backgroundColor: 'var(--color-primary)' }}
             >
-              Добавить в галерею
+              {t('addToGallery')}
             </button>
           </div>
         )}
@@ -157,7 +159,7 @@ export default function GalleryAdminPage() {
 
       {/* Сетка */}
       {images.length === 0 ? (
-        <p className="text-zinc-500 text-center py-10">Галерея пуста.</p>
+        <p className="text-zinc-500 text-center py-10">{t('empty')}</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {images.map((img) => (

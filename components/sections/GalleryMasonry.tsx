@@ -9,7 +9,13 @@ function distributeIntoColumns(images: GalleryItem[], cols: number) {
   return columns
 }
 
-export default function GalleryMasonry({ images }: { images: GalleryItem[] }) {
+interface GalleryMasonryProps {
+  images: GalleryItem[]
+  title: string
+  subtitle: string
+}
+
+export default function GalleryMasonry({ images, title, subtitle }: GalleryMasonryProps) {
   const [lightbox, setLightbox] = useState<number | null>(null)
   const [cols, setCols] = useState(3) // по умолчанию 3 колонки
 
@@ -56,16 +62,23 @@ export default function GalleryMasonry({ images }: { images: GalleryItem[] }) {
 
   if (!images.length) return null
 
+  const photoCountText =
+    images.length === 1
+      ? 'фотография'
+      : images.length < 5
+      ? 'фотографии'
+      : 'фотографий'
+
   return (
     <section id="gallery" className="py-20 bg-surface-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Заголовок – такой же как в первой версии */}
+        {/* Заголовок */}
         <div className="flex flex-col items-center text-center mb-14">
           <span className="text-[11px] font-semibold tracking-[0.28em] uppercase text-primary mb-4">
-            Наш ресторан
+            {subtitle}
           </span>
           <h2 className="font-heading text-4xl sm:text-5xl text-text-primary leading-tight">
-            Галерея
+            {title}
           </h2>
           <div className="flex items-center gap-3 mt-5">
             <div className="h-px w-12 bg-border" />
@@ -92,15 +105,11 @@ export default function GalleryMasonry({ images }: { images: GalleryItem[] }) {
 
         <p className="text-center text-xs text-text-tertiary mt-6 tracking-wide">
           {images.length}{' '}
-          {images.length === 1
-            ? 'фотография'
-            : images.length < 5
-            ? 'фотографии'
-            : 'фотографий'}
+          {photoCountText}
         </p>
       </div>
 
-      {/* Лайтбокс – идентичен первой версии */}
+      {/* Лайтбокс */}
       {lightbox !== null && (
         <Lightbox
           images={images}
@@ -128,7 +137,6 @@ function MasonryTile({ img, onClick }: { img: GalleryItem; onClick: () => void }
         alt={img.caption || 'Фото'}
         className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         loading="lazy"
-        // Не задаём фиксированную высоту – изображение сохраняет пропорции
       />
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/35 transition-colors duration-400" />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -145,7 +153,7 @@ function MasonryTile({ img, onClick }: { img: GalleryItem; onClick: () => void }
   )
 }
 
-/* ─── Lightbox (такой же как в первой версии, можно вынести в общий файл) ─── */
+/* ─── Lightbox (такой же как в GalleryBento) ─── */
 function Lightbox({
   images,
   index,

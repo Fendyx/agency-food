@@ -3,6 +3,7 @@ export async function fetchMenu(tenantId: string) {
     `${process.env.NEXT_PUBLIC_API_URL}/api/saas/menu?tenantId=${tenantId}`,
     { cache: 'no-store' }
   )
+  console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
   if (!res.ok) throw new Error('Failed to fetch menu')
   return res.json()
 }

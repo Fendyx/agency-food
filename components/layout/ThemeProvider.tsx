@@ -18,44 +18,29 @@ export function ThemeProvider({
   children: React.ReactNode
   defaultTheme?: Theme
 }) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme)
+  // Всегда светлая тема, игнорируем defaultTheme
+  const [theme, setTheme] = useState<Theme>('light')
 
-  // При монтировании определяем тему
+  // При монтировании ничего не читаем из localStorage, всегда light
   useEffect(() => {
-    const stored = localStorage.getItem('theme') as Theme | null
-    if (stored) {
-      setTheme(stored)
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark')
-    }
+    // Ничего не делаем, оставляем 'light'
+    // Можно оставить пустой или вообще удалить этот useEffect
   }, [])
 
-  // Обновляем класс <html> и localStorage
+  // Обновляем класс <html> и localStorage (но класс dark никогда не добавится)
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
+    root.classList.remove('dark') // гарантированно удаляем dark
     localStorage.setItem('theme', theme)
   }, [theme])
 
-  // Следим за системными изменениями (если пользователь не выбрал явно)
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handler = (e: MediaQueryListEvent) => {
-      const stored = localStorage.getItem('theme')
-      if (!stored) {
-        // Только если нет сохранённого выбора, следуем системе
-        setTheme(e.matches ? 'dark' : 'light')
-      }
-    }
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  // Следим за системными изменениями не нужно
+  // useEffect(() => { ... mediaQuery ... }, []) — можно удалить или закомментировать
 
-  const toggleTheme = () => setTheme(prev => (prev === 'light' ? 'dark' : 'light'))
+  // toggleTheme больше не нужен, но оставим для совместимости
+  const toggleTheme = () => {
+    // Ничего не делаем, тема всегда светлая
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

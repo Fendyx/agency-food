@@ -1,8 +1,10 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import { siteConfig } from '@/site.config'
 import MenuItemCard from '@/components/ui/MenuItemCard'
 import type { MenuItem } from '@/types'
+import { useTranslations } from 'next-intl'
+import { useTenantSettings } from '@/lib/useTenantSettings'
 
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'твой-cloud-name'
 const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'menu_photos'
@@ -15,6 +17,7 @@ interface CategoryOption {
 }
 
 export default function MenuManager({ token }: { token: string }) {
+  const t = useTranslations('admin.menuManager')
   const [items, setItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -44,7 +47,17 @@ export default function MenuManager({ token }: { token: string }) {
 
   const cloudinaryWidgetRef = useRef<any>(null)
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
-  const availableLangs = ['en', 'de', 'ru']
+
+  // ─── НОВОЕ: получаем язык и валюту из настроек ─────────────────
+  const { settings } = useTenantSettings(siteConfig.tenantId)
+  const primaryLanguage = settings?.primaryLanguage || 'pl'
+  const primaryCurrency = settings?.primaryCurrency || 'PLN'
+
+  const SUPPORTED_LANGUAGES = ['pl', 'en', 'de', 'ru', 'es', 'ua']
+  const availableLangs = useMemo(
+    () => SUPPORTED_LANGUAGES.filter(lang => lang !== primaryLanguage),
+    [primaryLanguage]
+  )
 
   const fetchItems = async () => {
     try {
@@ -58,7 +71,6 @@ export default function MenuManager({ token }: { token: string }) {
     }
   }
 
-  // Загрузка категорий
   useEffect(() => {
     if (!token) return
     fetch(`${apiUrl}/api/saas/categories`, {
@@ -114,7 +126,7 @@ export default function MenuManager({ token }: { token: string }) {
     if (cloudinaryWidgetRef.current && widgetReady) {
       cloudinaryWidgetRef.current.open()
     } else {
-      alert('Загрузчик ещё не готов, подождите секунду и попробуйте снова.')
+      alert(t('uploaderNotReady'))
     }
   }
 
@@ -184,7 +196,7 @@ export default function MenuManager({ token }: { token: string }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Удалить блюдо?')) return
+    if (!confirm(t('deleteConfirm'))) return
     try {
       await fetch(`${apiUrl}/api/saas/menu/${id}`, {
         method: 'DELETE',
@@ -195,6 +207,9 @@ export default function MenuManager({ token }: { token: string }) {
       console.error(err)
     }
   }
+
+  const getCategoryDisplayName = (cat: CategoryOption) =>
+  cat.translations?.[primaryLanguage] || cat.name || cat.key;
 
   const searchCategories = async (query: string) => {
     if (query.length < 2) {
@@ -215,88 +230,110 @@ export default function MenuManager({ token }: { token: string }) {
   }
 
   const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (useCustomCategory) {
-      const categoryKey = customCategoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-      try {
-        await fetch(`${apiUrl}/api/saas/categories`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            key: categoryKey,
-            name: customCategoryName,
-            translations: customCategoryTranslations,
-          }),
-        })
-        setForm(prev => ({ ...prev, categoryKey, category: customCategoryName }))
-      } catch (err) {
-        console.error('Не удалось сохранить категорию', err)
-      }
-    }
+  e.preventDefault()
 
-    const url = editingId
-      ? `${apiUrl}/api/saas/menu/${editingId}`
-      : `${apiUrl}/api/saas/menu`
-    const method = editingId ? 'PUT' : 'POST'
+  // Вычисляем финальные значения категории локально
+  let finalCategory = form.category
+  let finalCategoryKey = form.categoryKey
 
-    const payload = {
-      ...form,
-      translations,
-    }
+  if (useCustomCategory) {
+    const categoryKey = customCategoryName
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
 
     try {
-      const res = await fetch(url, {
-        method,
+      await fetch(`${apiUrl}/api/saas/categories`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          key: categoryKey,
+          name: customCategoryName,
+          translations: customCategoryTranslations,
+        }),
       })
-      if (res.ok) {
-        await fetchItems()
-        resetForm()
-      }
     } catch (err) {
-      console.error(err)
+      console.error(t('errorSaveCategory'), err)
     }
+
+    // Используем локальные переменные — не ждём setState
+    finalCategory = customCategoryName
+    finalCategoryKey = categoryKey
   }
 
-  if (loading) return <div className="text-center py-10">Загрузка меню...</div>
+  const url = editingId
+    ? `${apiUrl}/api/saas/menu/${editingId}`
+    : `${apiUrl}/api/saas/menu`
+  const method = editingId ? 'PUT' : 'POST'
+
+  const payload = {
+    ...form,
+    category: finalCategory,       // ← берём из локальных переменных
+    categoryKey: finalCategoryKey, // ← а не из form (которая ещё не обновилась)
+    translations,
+  }
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    if (res.ok) {
+      await fetchItems()
+      resetForm()
+    }
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+  if (loading) return <div className="text-center py-10 text-text-secondary">{t('loading')}</div>
+
+  const inputBaseClass = "w-full border border-border bg-surface-page text-text-primary p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-tertiary"
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">
-          Меню ресторана «{siteConfig.clientName}»
+    <div className="max-w-6xl mx-auto pb-12">
+      {/* Шапка */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <h2 className="text-2xl font-heading font-semibold text-text-primary">
+          {t('title', { clientName: siteConfig.clientName })}
         </h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 rounded text-white text-sm font-medium"
-          style={{ backgroundColor: 'var(--color-primary)' }}
+          className="px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium transition-opacity hover:opacity-90 shadow-sm active:scale-95"
         >
-          {showForm ? '✕ Закрыть' : '+ Добавить блюдо'}
+          {showForm ? t('close') : t('addDish')}
         </button>
       </div>
 
+      {/* Форма */}
       {showForm && (
-        <form onSubmit={handleSave} className="bg-white p-6 rounded shadow mb-8 space-y-4 border border-zinc-200">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Название блюда"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border p-2 rounded"
-              required
-            />
+        <form onSubmit={handleSave} className="bg-surface-card p-6 sm:p-8 rounded-2xl shadow-card mb-10 border border-border animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="grid sm:grid-cols-2 gap-x-6 gap-y-6">
+            
+            {/* Название */}
+            <div className="sm:col-span-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('name')}</label>
+              <input
+                type="text"
+                placeholder={t('name')}
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className={inputBaseClass}
+                required
+              />
+            </div>
 
             {/* Выбор категории */}
-            <div>
-              <label className="block text-sm font-medium text-zinc-700">Категория</label>
+            <div className="sm:col-span-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('category')}</label>
               <select
                 value={useCustomCategory ? '__custom__' : selectedCategory}
                 onChange={(e) => {
@@ -308,21 +345,22 @@ export default function MenuManager({ token }: { token: string }) {
                     updateCategoryFields(val, false)
                   }
                 }}
-                className="w-full border p-2 rounded mt-1"
+                className={`${inputBaseClass} appearance-none cursor-pointer`}
                 required
               >
-                <option value="">Выберите категорию</option>
+                <option value="">{t('selectCategory')}</option>
                 {categories.map(c => (
-                  <option key={c.key} value={c.key}>{c.name || c.key}</option>
+                  <option key={c.key} value={c.key}>{getCategoryDisplayName(c)}</option>
                 ))}
-                <option value="__custom__">Своя категория</option>
+                <option value="__custom__">{t('customCategory')}</option>
               </select>
             </div>
 
+            {/* Блок кастомной категории */}
             {useCustomCategory && (
-              <>
-                <div className="sm:col-span-2 relative">
-                  <label className="block text-sm font-medium text-zinc-700">Название категории</label>
+              <div className="sm:col-span-2 bg-surface-page border border-border rounded-xl p-5 space-y-5">
+                <div className="relative">
+                  <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('categoryName')}</label>
                   <input
                     type="text"
                     value={customCategoryName}
@@ -338,16 +376,18 @@ export default function MenuManager({ token }: { token: string }) {
                     }}
                     onFocus={() => categorySuggestions.length > 0 && setShowSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                    className="w-full border p-2 rounded mt-1"
+                    className={`${inputBaseClass} bg-surface-card`}
                     required
                   />
+                  
+                  {/* Автодополнение */}
                   {showSuggestions && (
-                    <ul className="absolute z-10 w-full bg-white border border-zinc-300 rounded-b-lg shadow-dropdown max-h-40 overflow-y-auto">
+                    <ul className="absolute z-20 w-full bg-surface-card border border-border rounded-xl shadow-dropdown mt-1 max-h-48 overflow-y-auto overflow-hidden">
                       {categorySuggestions.map(cat => (
                         <li
                           key={cat.key}
                           onMouseDown={() => {
-                            setCustomCategoryName(cat.name || cat.key)
+                            setCustomCategoryName(getCategoryDisplayName(cat))
                             setCustomCategoryTranslations(cat.translations || {})
                             setForm(prev => ({
                               ...prev,
@@ -356,11 +396,11 @@ export default function MenuManager({ token }: { token: string }) {
                             }))
                             setShowSuggestions(false)
                           }}
-                          className="px-3 py-2 text-sm hover:bg-surface-hover cursor-pointer"
+                          className="px-4 py-3 text-sm hover:bg-surface-hover cursor-pointer border-b border-border-light last:border-0 transition-colors"
                         >
-                          <div className="font-medium">{cat.name || cat.key}</div>
+                          <div className="font-medium text-text-primary">{getCategoryDisplayName(cat)}</div>
                           {cat.translations && (
-                            <div className="text-xs text-text-tertiary">
+                            <div className="text-xs text-text-tertiary mt-1">
                               {Object.entries(cat.translations).map(([lang, val]) => `${lang}: ${val}`).join(', ')}
                             </div>
                           )}
@@ -369,122 +409,161 @@ export default function MenuManager({ token }: { token: string }) {
                     </ul>
                   )}
                 </div>
-                <details className="sm:col-span-2 mt-2">
-                  <summary className="cursor-pointer text-sm font-medium text-text-secondary">
-                    Переводы категории
+
+                <details className="group">
+                  <summary className="cursor-pointer text-sm font-medium text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2 list-none [&::-webkit-details-marker]:hidden">
+                    <svg className="w-4 h-4 text-text-tertiary transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    {t('categoryTranslations')}
                   </summary>
-                  <div className="space-y-2 mt-2">
+                  <div className="grid sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-border-light">
                     {availableLangs.map(lang => (
-                      <div key={lang} className="border p-2 rounded">
-                        <p className="text-xs font-medium">{lang.toUpperCase()}</p>
+                      <div key={lang}>
+                        <p className="text-xs font-semibold text-text-tertiary mb-1.5 uppercase tracking-wider">{lang}</p>
                         <input
                           type="text"
-                          placeholder="Название"
+                          placeholder={t('translations.name')}
                           value={customCategoryTranslations[lang] || ''}
                           onChange={(e) => setCustomCategoryTranslations(prev => ({
                             ...prev,
                             [lang]: e.target.value
                           }))}
-                          className="w-full border p-1 rounded"
+                          className={`${inputBaseClass} p-2.5 text-sm bg-surface-card`}
                         />
                       </div>
                     ))}
                   </div>
                 </details>
-              </>
+              </div>
             )}
 
+            {/* Описание */}
             <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('description')}</label>
               <textarea
-                placeholder="Описание"
+                placeholder={t('description')}
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full border p-2 rounded"
-                rows={2}
+                className={inputBaseClass}
+                rows={3}
               />
             </div>
-            <input
-              type="number"
-              placeholder="Цена (zł)"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: +e.target.value })}
-              className="w-full border p-2 rounded"
-              required
-            />
-            <div className="flex gap-2 items-end">
+
+            {/* Цена */}
+            <div className="sm:col-span-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('price')}</label>
               <input
-                type="text"
-                placeholder="URL изображения"
-                value={form.image}
-                onChange={(e) => setForm({ ...form, image: e.target.value })}
-                className="flex-1 border p-2 rounded"
+                type="number"
+                placeholder={t('price')}
+                value={form.price || ''}
+                onChange={(e) => setForm({ ...form, price: +e.target.value })}
+                className={inputBaseClass}
+                required
               />
-              <button
-                type="button"
-                onClick={openCloudinaryWidget}
-                className="px-4 py-2 rounded text-white bg-blue-600 hover:bg-blue-700 text-sm"
-              >
-                Загрузить
-              </button>
+            </div>
+
+            {/* Изображение */}
+            <div className="sm:col-span-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">{t('imageUrl')}</label>
+              <div className="flex gap-3 items-center">
+                <input
+                  type="text"
+                  placeholder="https://..."
+                  value={form.image}
+                  onChange={(e) => setForm({ ...form, image: e.target.value })}
+                  className={inputBaseClass}
+                />
+                <button
+                  type="button"
+                  onClick={openCloudinaryWidget}
+                  className="px-5 py-3 rounded-xl bg-surface-inverse text-text-inverse hover:opacity-90 text-sm font-medium transition-opacity shadow-sm whitespace-nowrap shrink-0"
+                >
+                  {t('upload')}
+                </button>
+              </div>
+            </div>
+
+            {/* Превью изображения */}
+            {form.image && (
+              <div className="sm:col-span-2">
+                <p className="block text-sm font-medium text-text-secondary mb-2">{t('preview')}</p>
+                <img 
+                  src={form.image} 
+                  alt={t('preview')} 
+                  className="h-40 w-40 object-cover rounded-xl border border-border shadow-sm" 
+                />
+              </div>
+            )}
+
+            {/* Переводы блюда */}
+            <div className="sm:col-span-2">
+              <details className="group border border-border rounded-xl bg-surface-page overflow-hidden">
+                <summary className="cursor-pointer p-4 text-sm font-medium text-text-primary hover:bg-surface-hover transition-colors flex justify-between items-center list-none [&::-webkit-details-marker]:hidden border-b border-transparent group-open:border-border">
+                  {t('dishTranslations')}
+                  <svg className="w-5 h-5 text-text-tertiary transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div className="p-4 sm:p-6 grid sm:grid-cols-3 gap-5 bg-surface-card/50">
+                  {availableLangs.map(lang => (
+                    <div key={lang} className="bg-surface-page p-4 rounded-xl border border-border-light shadow-sm">
+                      <p className="text-xs font-semibold text-text-tertiary mb-3 uppercase tracking-wider">{lang}</p>
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          placeholder={t('translations.name')}
+                          value={translations[lang]?.name || ''}
+                          onChange={(e) => setTranslations(prev => ({
+                            ...prev,
+                            [lang]: { ...prev[lang], name: e.target.value }
+                          }))}
+                          className={`${inputBaseClass} p-2.5 text-sm`}
+                        />
+                        <textarea
+                          placeholder={t('translations.description')}
+                          value={translations[lang]?.description || ''}
+                          onChange={(e) => setTranslations(prev => ({
+                            ...prev,
+                            [lang]: { ...prev[lang], description: e.target.value }
+                          }))}
+                          className={`${inputBaseClass} p-2.5 text-sm`}
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
             </div>
           </div>
-          {form.image && (
-            <img src={form.image} alt="Превью" className="h-32 object-cover rounded" />
-          )}
 
-          {/* Блок переводов блюда */}
-          <details className="mt-4">
-            <summary className="cursor-pointer text-sm font-medium text-text-secondary">
-              Переводы блюда (опционально)
-            </summary>
-            <div className="space-y-2 mt-2">
-              {availableLangs.map(lang => (
-                <div key={lang} className="border p-2 rounded">
-                  <p className="text-xs font-medium">{lang.toUpperCase()}</p>
-                  <input
-                    type="text"
-                    placeholder="Название"
-                    value={translations[lang]?.name || ''}
-                    onChange={(e) => setTranslations(prev => ({
-                      ...prev,
-                      [lang]: { ...prev[lang], name: e.target.value }
-                    }))}
-                    className="w-full border p-1 rounded mb-1"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Описание"
-                    value={translations[lang]?.description || ''}
-                    onChange={(e) => setTranslations(prev => ({
-                      ...prev,
-                      [lang]: { ...prev[lang], description: e.target.value }
-                    }))}
-                    className="w-full border p-1 rounded"
-                  />
-                </div>
-              ))}
-            </div>
-          </details>
-
-          <div className="flex justify-end gap-2">
+          {/* Кнопки действий */}
+          <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-border">
             {editingId && (
-              <button type="button" onClick={resetForm} className="px-4 py-2 text-gray-500">
-                Отмена
+              <button 
+                type="button" 
+                onClick={resetForm} 
+                className="px-5 py-2.5 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-hover font-medium transition-colors"
+              >
+                {t('cancel')}
               </button>
             )}
             <button
               type="submit"
-              className="px-4 py-2 rounded text-white font-medium"
-              style={{ backgroundColor: 'var(--color-primary)' }}
+              className="px-6 py-2.5 rounded-xl bg-primary text-white font-medium shadow-sm transition-opacity hover:opacity-90 active:scale-95"
             >
-              {editingId ? 'Сохранить' : 'Добавить'}
+              {editingId ? t('save') : t('add')}
             </button>
           </div>
         </form>
       )}
 
+      {/* Список блюд */}
       {items.length === 0 ? (
-        <p className="text-zinc-500 text-center py-10">Меню пока пусто. Добавьте первое блюдо.</p>
+        <div className="text-center py-16 px-4 bg-surface-card rounded-2xl border border-dashed border-border">
+          <p className="text-text-secondary">{t('empty')}</p>
+        </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => (
@@ -492,6 +571,7 @@ export default function MenuManager({ token }: { token: string }) {
               key={item._id}
               item={item}
               mode="admin"
+              primaryCurrency={primaryCurrency}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { siteConfig } from '@/site.config'
+import { useTranslations } from 'next-intl'
 
 type NewsType = 'info' | 'marketing' | 'alert'
 
@@ -26,6 +27,7 @@ const TYPE_COLORS: Record<NewsType, string> = {
 }
 
 export default function GopublicaPage() {
+  const t = useTranslations('admin.gopublicaPage')
   const [news, setNews] = useState<NewsPost[]>([])
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState<string | null>(null)
@@ -42,7 +44,6 @@ export default function GopublicaPage() {
   useEffect(() => {
     if (!token) return
 
-    // tariff пока заглушка — позже можно брать из подписки или настроек
     const tariff = 'basic'
 
     fetch(
@@ -55,19 +56,17 @@ export default function GopublicaPage() {
   }, [token])
 
   if (loading) {
-    return <div className="text-center py-10 text-text-secondary">Загрузка новостей...</div>
+    return <div className="text-center py-10 text-text-secondary">{t('loading')}</div>
   }
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-6">Новости от Gopublica</h2>
+      <h2 className="text-xl font-semibold mb-6">{t('title')}</h2>
 
       {news.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed border-border rounded-xl">
-          <p className="text-text-secondary">Пока нет новостей</p>
-          <p className="text-sm text-text-tertiary mt-1">
-            Здесь будут появляться новости и уведомления от вашего сервис-провайдера.
-          </p>
+          <p className="text-text-secondary">{t('empty')}</p>
+          <p className="text-sm text-text-tertiary mt-1">{t('emptyDesc')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -86,7 +85,7 @@ export default function GopublicaPage() {
               <p className="text-text-secondary text-sm whitespace-pre-line">{item.content}</p>
               {item.expiresAt && (
                 <p className="text-xs text-text-tertiary mt-2">
-                  Действует до: {new Date(item.expiresAt).toLocaleDateString()}
+                  {t('expires')} {new Date(item.expiresAt).toLocaleDateString()}
                 </p>
               )}
             </article>

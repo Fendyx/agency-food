@@ -1,15 +1,15 @@
 import type { SiteConfig } from './types'
 
 export const siteConfig: SiteConfig = {
-  clientName: 'Cafe am Petriplatz-Frühstück',
-  tenantId: 'pizzeria-brava',
+  clientName: 'Café Oliv',
+  tenantId: 'cafe-oliv',
 
   theme: {
     primary: '#C8102E',
     accent: '#F1A208',
     fontHeading: 'Playfair Display',
     fontBody: 'Inter',
-    heroStyle: 'split', // <-- просто меняй значение: 'split' | 'centered' | 'video' | 'slider' | 'image-bg'
+    heroStyle: 'slider', // <-- просто меняй значение: 'split' | 'centered' | 'video' | 'slider' | 'image-bg'
   },
 
   features: {
@@ -23,16 +23,15 @@ export const siteConfig: SiteConfig = {
   contact: {
     phone: '+48 123 456 789',
     address: 'Kraków, Floriańska 15',
-    email: 'hello@cafeampetriplatz.de',
-    hours: 'Пн–Пт 11:00–22:00, Сб–Вс 12:00–23:00',
-    googleMapsUrl: 'https://maps.google.com/?q=Cafe+am+Petriplatz-Frühstück+Berlin',
+    email: 'info@cafeoliv.de',
+    hours: 'Pn–Pt 11:00–22:00, Sb–Nd 12:00–23:00',
+    googleMapsUrl: 'https://maps.app.goo.gl/P7xg2sXH4MjssYMVA',
   },
 
   seo: {
-    title: 'Cafe am Petriplatz-Frühstück — лучший грузинский ресторан в Кракове',
-    description:
-      'Свежие грузинские блюда, пиццы и напитки в сердце Кракова. Бронирование столов онлайн.',
-  },
+  title: 'Café Oliv — Espresso & modernes Bistro',
+  description: 'Gemütliches Café im Herzen Berlins mit industriellem Flair. Genießen Sie fachmännisch zubereiteten Kaffee, frisches Gebäck und angesagte Bistro-Gerichte.',
+},
 
   menuStyle: 'grid',
   galleryStyle: 'bento',
