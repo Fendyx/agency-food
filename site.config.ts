@@ -1,15 +1,15 @@
 import type { SiteConfig } from './types'
 
 export const siteConfig: SiteConfig = {
-  clientName: 'Café Oliv',
-  tenantId: 'cafe-oliv',
+  clientName: 'Café Flo',
+  tenantId: 'cafe-flo',
 
   theme: {
     primary: '#C8102E',
     accent: '#F1A208',
     fontHeading: 'Playfair Display',
     fontBody: 'Inter',
-    heroStyle: 'slider', // <-- просто меняй значение: 'split' | 'centered' | 'video' | 'slider' | 'image-bg'
+    heroStyle: 'video', // <-- просто меняй значение: 'split' | 'centered' | 'video' | 'slider' | 'image-bg'
   },
 
   features: {
@@ -28,9 +28,9 @@ export const siteConfig: SiteConfig = {
     googleMapsUrl: 'https://maps.app.goo.gl/P7xg2sXH4MjssYMVA',
   },
 
-  seo: {
-  title: 'Café Oliv — Espresso & modernes Bistro',
-  description: 'Gemütliches Café im Herzen Berlins mit industriellem Flair. Genießen Sie fachmännisch zubereiteten Kaffee, frisches Gebäck und angesagte Bistro-Gerichte.',
+seo: {
+  title: 'Café Flo am Wasserturm  Kaffee & Quiche',
+  description: 'Kaffee und Quiche in historischem Ambiente. Genießen Sie unsere Terrasse mit herrlichem Blick auf den Mannheimer Wasserturm.',
 },
 
   menuStyle: 'grid',

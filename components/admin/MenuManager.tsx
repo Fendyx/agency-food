@@ -181,7 +181,7 @@ export default function MenuManager({ token }: { token: string }) {
       updateCategoryFields(foundCat.key, false)
     } else if (item.categoryKey) {
       setUseCustomCategory(true)
-      setCustomCategoryName(item.category)
+      setCustomCategoryName(item.category || '')
       setCustomCategoryTranslations(item.translations?.category as any || {})
       setSelectedCategory('')
     } else {
