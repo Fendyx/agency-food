@@ -62,12 +62,6 @@ export default function GalleryMasonry({ images, title, subtitle }: GalleryMason
 
   if (!images.length) return null
 
-  const photoCountText =
-    images.length === 1
-      ? 'фотография'
-      : images.length < 5
-      ? 'фотографии'
-      : 'фотографий'
 
   return (
     <section id="gallery" className="py-20 bg-surface-page">
@@ -102,11 +96,6 @@ export default function GalleryMasonry({ images, title, subtitle }: GalleryMason
             </div>
           ))}
         </div>
-
-        <p className="text-center text-xs text-text-tertiary mt-6 tracking-wide">
-          {images.length}{' '}
-          {photoCountText}
-        </p>
       </div>
 
       {/* Лайтбокс */}

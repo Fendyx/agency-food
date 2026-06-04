@@ -43,13 +43,6 @@ export default function GalleryBento({ images, title, subtitle }: GalleryBentoPr
 
   if (!images.length) return null
 
-  // Можно также вынести в переводы, оставим пока как есть
-  const photoCountText =
-    images.length === 1
-      ? 'фотография'
-      : images.length < 5
-      ? 'фотографии'
-      : 'фотографий'
 
   return (
     <section id="gallery" className="py-20 bg-surface-page">
@@ -87,9 +80,6 @@ export default function GalleryBento({ images, title, subtitle }: GalleryBentoPr
         </div>
 
         {/* ── Photo count ─────────────────────────────────── */}
-        <p className="text-center text-xs text-text-tertiary mt-6 tracking-wide">
-          {images.length} {photoCountText}
-        </p>
       </div>
 
       {/* ── Lightbox ────────────────────────────────────── */}
