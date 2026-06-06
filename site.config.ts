@@ -1,15 +1,15 @@
 import type { SiteConfig } from './types'
 
 export const siteConfig: SiteConfig = {
-  clientName: 'Zwickerstube',
-  tenantId: 'zwickerstube',
+  clientName: 'marias - Smoothies, Bagels and More',
+  tenantId: 'marias',
 
   theme: {
-    primary: '#C8102E',
+    primary: '#6fd50f',
     accent: '#F1A208',
     fontHeading: 'Playfair Display',
     fontBody: 'Inter',
-    heroStyle: 'split', // <-- просто меняй значение: 'split' | 'centered' | 'video' | 'slider' | 'image-bg'
+    heroStyle: 'video', // <-- просто меняй значение: 'split' | 'centered' | 'video' | 'slider' | 'image-bg'
   },
 
   features: {
@@ -29,15 +29,15 @@ export const siteConfig: SiteConfig = {
   },
 
 seo: {
-  title: 'Zwickerstube - Kaffee und Quiche in Mannheim',
-  description: 'Genießen Sie hausgemachte Quiches und frisch gebrühten Kaffee in der gemütlichen Zwickerstube in Mannheim. Perfekt für Frühstück, Mittagessen oder einen entspannten Nachmittag.',
+  title: 'marias - Smoothies, Bagels and More',
+  description: 'Genieße köstliche Smoothies, Bagels und mehr bei marias! Besuche uns in Krakau oder bestelle online für einen leckeren Snack.',
 },
 
   menuStyle: 'grid',
   galleryStyle: 'bento',
   // === Новые поля для Hero ===
   // Для варианта 'video'
-  heroVideoUrl: '/video/hero-bg.mp4',
+  heroVideoUrl: '/video/smoothie.mp4',
   heroPosterUrl: '/video/hero-poster.jpg',
 
   // Для варианта 'slider' (3-4 изображения)
