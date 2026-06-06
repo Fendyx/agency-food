@@ -202,5 +202,23 @@
       "emptyDesc": "Tutaj będą pojawiać się wiadomości i powiadomienia od Twojego dostawcy usług.",
       "expires": "Ważne do:"
     }
+  },
+  "notifications": {
+    "new_booking": "🍽️ Nowa rezerwacja",
+    "new_booking_body": "{name} · {date} o {time} · {guests} gości",
+    "new_booking_body_no_guests": "{name} · {date} o {time}",
+    "allow_notifications_title": "Włącz powiadomienia",
+    "allow_notifications_text": "Otrzymuj alerty o nowych rezerwacjach nawet przy zamkniętych kartach.",
+    "allow_button": "Zezwól",
+    "later_button": "Później",
+    "notifications_blocked": "🚫 Powiadomienia zablokowane",
+    "notifications_blocked_hint": "Kliknij kłódkę 🔒 w pasku adresu → Powiadomienia → Zezwalaj.",
+    "background_notifications_title": "⚡ Powiadomienia w tle",
+    "background_notifications_text": "Bez tego powiadomienia nie przyjdą, gdy karty są zamknięte.",
+    "enable_button": "Włącz",
+    "push_error_prefix": "❌",
+    "sound_hint": "Kliknij gdziekolwiek na stronie, aby włączyć dźwięk",
+    "subscribe_try_again": "Spróbuj ponownie",
+    "subscribe_connecting": "Łączenie..."
   }
 }

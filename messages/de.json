@@ -202,5 +202,23 @@
       "emptyDesc": "Hier erscheinen Nachrichten und Benachrichtigungen von Ihrem Dienstleister.",
       "expires": "Gültig bis:"
     }
+  },
+  "notifications": {
+    "new_booking": "🍽️ Neue Buchung",
+    "new_booking_body": "{name} · {date} um {time} · {guests} Gäste",
+    "new_booking_body_no_guests": "{name} · {date} um {time}",
+    "allow_notifications_title": "Benachrichtigungen aktivieren",
+    "allow_notifications_text": "Erhalten Sie Warnungen zu neuen Buchungen, auch wenn Tabs geschlossen sind.",
+    "allow_button": "Erlauben",
+    "later_button": "Später",
+    "notifications_blocked": "🚫 Benachrichtigungen blockiert",
+    "notifications_blocked_hint": "Klicken Sie auf das Schloss 🔒 in der Adressleiste → Benachrichtigungen → Erlauben.",
+    "background_notifications_title": "⚡ Hintergrundbenachrichtigungen",
+    "background_notifications_text": "Ohne dies erhalten Sie keine Benachrichtigungen, wenn Tabs geschlossen sind.",
+    "enable_button": "Aktivieren",
+    "push_error_prefix": "❌",
+    "sound_hint": "Klicken Sie irgendwo auf die Seite, um den Ton zu aktivieren",
+    "subscribe_try_again": "Erneut versuchen",
+    "subscribe_connecting": "Verbinden..."
   }
 }

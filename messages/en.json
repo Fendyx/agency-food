@@ -203,5 +203,24 @@
       "emptyDesc": "News and notifications from your service provider will appear here.",
       "expires": "Valid until:"
     }
+  },
+
+  "notifications": {
+    "new_booking": "🍽️ New booking",
+    "new_booking_body": "{name} · {date} at {time} · {guests} guests",
+    "new_booking_body_no_guests": "{name} · {date} at {time}",
+    "allow_notifications_title": "Enable notifications",
+    "allow_notifications_text": "Receive alerts about new bookings even when tabs are closed.",
+    "allow_button": "Allow",
+    "later_button": "Later",
+    "notifications_blocked": "🚫 Notifications blocked",
+    "notifications_blocked_hint": "Click the lock 🔒 in the address bar → Notifications → Allow.",
+    "background_notifications_title": "⚡ Background notifications",
+    "background_notifications_text": "Without this, notifications won't arrive when tabs are closed.",
+    "enable_button": "Enable",
+    "push_error_prefix": "❌",
+    "sound_hint": "Click anywhere on the page to enable sound",
+    "subscribe_try_again": "Try again",
+    "subscribe_connecting": "Connecting..."
   }
 }
