@@ -1,15 +1,15 @@
 import type { SiteConfig } from './types'
 
 export const siteConfig: SiteConfig = {
-  clientName: 'Café Flo',
-  tenantId: 'cafe-flo',
+  clientName: 'Zwickerstube',
+  tenantId: 'zwickerstube',
 
   theme: {
     primary: '#C8102E',
     accent: '#F1A208',
     fontHeading: 'Playfair Display',
     fontBody: 'Inter',
-    heroStyle: 'video', // <-- просто меняй значение: 'split' | 'centered' | 'video' | 'slider' | 'image-bg'
+    heroStyle: 'split', // <-- просто меняй значение: 'split' | 'centered' | 'video' | 'slider' | 'image-bg'
   },
 
   features: {
@@ -29,8 +29,8 @@ export const siteConfig: SiteConfig = {
   },
 
 seo: {
-  title: 'Café Flo am Wasserturm  Kaffee & Quiche',
-  description: 'Kaffee und Quiche in historischem Ambiente. Genießen Sie unsere Terrasse mit herrlichem Blick auf den Mannheimer Wasserturm.',
+  title: 'Zwickerstube - Kaffee und Quiche in Mannheim',
+  description: 'Genießen Sie hausgemachte Quiches und frisch gebrühten Kaffee in der gemütlichen Zwickerstube in Mannheim. Perfekt für Frühstück, Mittagessen oder einen entspannten Nachmittag.',
 },
 
   menuStyle: 'grid',
