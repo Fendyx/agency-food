@@ -1,11 +1,11 @@
 import type { SiteConfig } from './types'
 
 export const siteConfig: SiteConfig = {
-  clientName: 'marias - Smoothies, Bagels and More',
-  tenantId: 'marias',
+  clientName: 'Lavendel Eatery',
+  tenantId: 'lavendel-eatery',
 
   theme: {
-    primary: '#6fd50f',
+    primary: '#8c0fd5',
     accent: '#F1A208',
     fontHeading: 'Playfair Display',
     fontBody: 'Inter',
@@ -29,15 +29,15 @@ export const siteConfig: SiteConfig = {
   },
 
 seo: {
-  title: 'marias - Smoothies, Bagels and More',
-  description: 'Genieße köstliche Smoothies, Bagels und mehr bei marias! Besuche uns in Krakau oder bestelle online für einen leckeren Snack.',
+  title: 'Lavendel Eatery - Bowls, Wraps & Matcha in Würzburg',
+  description: 'Genieße gesunde Bowls, frische Wraps, leckeren Kaffee und Matcha-Spezialitäten in der Lavendel Eatery. Besuche uns in Würzburg für eine köstliche Auszeit!',
 },
 
   menuStyle: 'grid',
   galleryStyle: 'bento',
   // === Новые поля для Hero ===
   // Для варианта 'video'
-  heroVideoUrl: '/video/smoothie.mp4',
+  heroVideoUrl: '/video/restaurant_interior.mp4',
   heroPosterUrl: '/video/hero-poster.jpg',
 
   // Для варианта 'slider' (3-4 изображения)

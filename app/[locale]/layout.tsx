@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Café Oliv', 
+  title: 'Lavendel Eatery', 
   description: 'Restaurant',
 };
 
