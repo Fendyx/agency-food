@@ -6,7 +6,7 @@ import { siteConfig } from '@/site.config';
 import Menu from '@/components/Menu';
 import type { MenuItem } from '@/types';
 
-export default function MenuPage() {
+export default function MenuClient() {
   const { selectedBranch } = useBranch();
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);

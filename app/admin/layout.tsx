@@ -1,68 +1,83 @@
-'use client'
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { NextIntlClientProvider, useTranslations } from 'next-intl'
-import { siteConfig } from '@/site.config'
-import { NotificationProvider } from '@/lib/useNotifications'
-import AdminNotifications from '@/components/admin/AdminNotifications'
-import AdminLanguageSwitcher from '@/components/admin/AdminLanguageSwitcher'
-import { loadMessages } from '@/lib/adminLocale'
-import { LayoutDashboard, UtensilsCrossed, ImageIcon, CalendarCheck, Megaphone, Settings, LogOut } from 'lucide-react'
+'use client';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { NextIntlClientProvider, useTranslations } from 'next-intl';
+import { siteConfig } from '@/site.config';
+import { NotificationProvider } from '@/lib/useNotifications';
+import AdminNotifications from '@/components/admin/AdminNotifications';
+import AdminLanguageSwitcher from '@/components/admin/AdminLanguageSwitcher';
+import { AdminBranchSwitcher } from '@/components/admin/AdminBranchSwitcher';
+import { loadMessages } from '@/lib/adminLocale';
+import {
+  LayoutDashboard,
+  UtensilsCrossed,
+  ImageIcon,
+  CalendarCheck,
+  Megaphone,
+  Settings,
+  LogOut,
+  Store, // ← добавили иконку для филиалов
+} from 'lucide-react';
+import { BranchProvider } from '@/components/Branch/BranchContext';
 
-const DEFAULT_LOCALE = 'pl'
+const DEFAULT_LOCALE = 'pl';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const router = useRouter()
-  const [token, setToken] = useState<string | null>(null)
-  const [locale, setLocale] = useState(DEFAULT_LOCALE)
-  const [messages, setMessages] = useState<Record<string, any> | null>(null)
+  const pathname = usePathname();
+  const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
+  const [locale, setLocale] = useState(DEFAULT_LOCALE);
+  const [messages, setMessages] = useState<Record<string, any> | null>(null);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('saas_token')
+    const savedToken = localStorage.getItem('saas_token');
     if (!savedToken) {
-      router.push('/admin/login')
+      router.push('/admin/login');
     } else {
-      setToken(savedToken)
+      setToken(savedToken);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    const storedLocale = localStorage.getItem('admin_locale') || DEFAULT_LOCALE
-    setLocale(storedLocale)
-    loadMessages(storedLocale).then(setMessages)
-  }, [])
+    const storedLocale = localStorage.getItem('admin_locale') || DEFAULT_LOCALE;
+    setLocale(storedLocale);
+    loadMessages(storedLocale).then(setMessages);
+  }, []);
 
   const handleLocaleChange = (newLocale: string) => {
-    localStorage.setItem('admin_locale', newLocale)
-    setLocale(newLocale)
-    loadMessages(newLocale).then(setMessages)
-  }
+    localStorage.setItem('admin_locale', newLocale);
+    setLocale(newLocale);
+    loadMessages(newLocale).then(setMessages);
+  };
 
   if (!messages || !token) {
-    if (pathname === '/admin/login') return <>{children}</>
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+    if (pathname === '/admin/login') return <>{children}</>;
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  if (pathname === '/admin/login') return <>{children}</>
+  if (pathname === '/admin/login') return <>{children}</>;
+
+  const tenantId = siteConfig.tenantId || process.env.NEXT_PUBLIC_TENANT_ID || '';
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <NotificationProvider token={token}>
-        <AdminLayoutInner token={token} locale={locale} onLocaleChange={handleLocaleChange}>
-          {children}
-        </AdminLayoutInner>
+        <BranchProvider tenantId={tenantId}>
+          <AdminLayoutInner token={token} locale={locale} onLocaleChange={handleLocaleChange}>
+            {children}
+          </AdminLayoutInner>
+        </BranchProvider>
         <AdminNotifications />
       </NotificationProvider>
     </NextIntlClientProvider>
-  )
+  );
 }
 
 function AdminLayoutInner({ token, locale, onLocaleChange, children }: any) {
-  const t = useTranslations('admin')
-  const pathname = usePathname()
-  const router = useRouter()
+  const t = useTranslations('admin');
+  const pathname = usePathname();
+  const router = useRouter();
 
   const navItems = [
     { href: '/admin', label: t('dashboard'), icon: LayoutDashboard },
@@ -70,8 +85,9 @@ function AdminLayoutInner({ token, locale, onLocaleChange, children }: any) {
     { href: '/admin/gallery', label: t('gallery'), icon: ImageIcon },
     { href: '/admin/reservations', label: t('reservations'), icon: CalendarCheck },
     { href: '/admin/gopublica', label: t('gopublica'), icon: Megaphone },
+    { href: '/admin/branches', label: t('branches'), icon: Store }, // ← новый пункт
     { href: '/admin/settings', label: t('settings'), icon: Settings },
-  ]
+  ];
 
   return (
     <div className="flex min-h-screen bg-zinc-50">
@@ -100,8 +116,8 @@ function AdminLayoutInner({ token, locale, onLocaleChange, children }: any) {
           <AdminLanguageSwitcher currentLocale={locale} onChange={onLocaleChange} />
           <button
             onClick={() => {
-              localStorage.removeItem('saas_token')
-              router.push('/admin/login')
+              localStorage.removeItem('saas_token');
+              router.push('/admin/login');
             }}
             className="w-full text-left text-sm text-zinc-500 hover:text-red-600 flex items-center gap-2"
           >
@@ -111,8 +127,11 @@ function AdminLayoutInner({ token, locale, onLocaleChange, children }: any) {
         </div>
       </aside>
       <main className="flex-1 p-6">
+        <div className="flex justify-end mb-4">
+          <AdminBranchSwitcher />
+        </div>
         {children}
       </main>
     </div>
-  )
+  );
 }

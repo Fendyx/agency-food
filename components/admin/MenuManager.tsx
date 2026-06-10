@@ -1,26 +1,28 @@
-'use client'
-import { useEffect, useState, useRef, useMemo } from 'react'
-import { siteConfig } from '@/site.config'
-import MenuItemCard from '@/components/ui/MenuItemCard'
-import type { MenuItem } from '@/types'
-import { useTranslations } from 'next-intl'
-import { useTenantSettings } from '@/lib/useTenantSettings'
+'use client';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { siteConfig } from '@/site.config';
+import MenuItemCard from '@/components/ui/MenuItemCard';
+import type { MenuItem } from '@/types';
+import { useTranslations } from 'next-intl';
+import { useTenantSettings } from '@/lib/useTenantSettings';
+import { useBranch } from '@/components/Branch/BranchContext'; // добавлено
 
-const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'твой-cloud-name'
-const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'menu_photos'
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'твой-cloud-name';
+const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'menu_photos';
 
 interface CategoryOption {
-  _id?: string
-  key: string
-  name?: string
-  translations: Record<string, string>
+  _id?: string;
+  key: string;
+  name?: string;
+  translations: Record<string, string>;
 }
 
 export default function MenuManager({ token }: { token: string }) {
-  const t = useTranslations('admin.menuManager')
-  const [items, setItems] = useState<MenuItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [editingId, setEditingId] = useState<string | null>(null)
+  const t = useTranslations('admin.menuManager');
+  const { selectedBranch } = useBranch(); // получаем выбранный филиал
+  const [items, setItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -28,81 +30,79 @@ export default function MenuManager({ token }: { token: string }) {
     category: '',
     categoryKey: '',
     image: '',
-  })
-  const [translations, setTranslations] = useState<Record<string, { name?: string; description?: string }>>({})
+  });
+  const [translations, setTranslations] = useState<Record<string, { name?: string; description?: string }>>({});
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [useCustomCategory, setUseCustomCategory] = useState(false);
+  const [customCategoryName, setCustomCategoryName] = useState('');
+  const [customCategoryTranslations, setCustomCategoryTranslations] = useState<Record<string, string>>({});
+  const [categorySuggestions, setCategorySuggestions] = useState<CategoryOption[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [widgetReady, setWidgetReady] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const cloudinaryWidgetRef = useRef<any>(null);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  // Категории
-  const [categories, setCategories] = useState<CategoryOption[]>([])
-  const [selectedCategory, setSelectedCategory] = useState('')
-  const [useCustomCategory, setUseCustomCategory] = useState(false)
-  const [customCategoryName, setCustomCategoryName] = useState('')
-  const [customCategoryTranslations, setCustomCategoryTranslations] = useState<Record<string, string>>({})
-
-  // Автодополнение
-  const [categorySuggestions, setCategorySuggestions] = useState<CategoryOption[]>([])
-  const [showSuggestions, setShowSuggestions] = useState(false)
-
-  const [widgetReady, setWidgetReady] = useState(false)
-  const [showForm, setShowForm] = useState(false)
-
-  const cloudinaryWidgetRef = useRef<any>(null)
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
-
-  // ─── НОВОЕ: получаем язык и валюту из настроек ─────────────────
-  const { settings } = useTenantSettings(siteConfig.tenantId)
-  const primaryLanguage = settings?.primaryLanguage || 'pl'
-  const primaryCurrency = settings?.primaryCurrency || 'PLN'
-
-  const SUPPORTED_LANGUAGES = ['pl', 'en', 'de', 'ru', 'es', 'ua']
-  const availableLangs = useMemo(
-    () => SUPPORTED_LANGUAGES.filter(lang => lang !== primaryLanguage),
-    [primaryLanguage]
-  )
+  const { settings } = useTenantSettings(siteConfig.tenantId);
+  const primaryLanguage = settings?.primaryLanguage || 'pl';
+  const primaryCurrency = settings?.primaryCurrency || 'PLN';
+  const SUPPORTED_LANGUAGES = ['pl', 'en', 'de', 'ru', 'es', 'ua'];
+  const availableLangs = useMemo(() => SUPPORTED_LANGUAGES.filter(lang => lang !== primaryLanguage), [primaryLanguage]);
 
   const fetchItems = async () => {
     try {
-      const res = await fetch(`${apiUrl}/api/saas/menu?tenantId=${siteConfig.tenantId}`)
-      const data = await res.json()
-      setItems(data)
+      let url = `${apiUrl}/api/saas/menu?tenantId=${siteConfig.tenantId}`;
+      if (selectedBranch) url += `&branchId=${selectedBranch._id}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      setItems(data);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
+  const fetchCategories = async () => {
+    if (!token) return;
+    try {
+      let url = `${apiUrl}/api/saas/categories`;
+      if (selectedBranch) url += `?branchId=${selectedBranch._id}`;
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setCategories(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    if (!token) return
-    fetch(`${apiUrl}/api/saas/categories`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(setCategories)
-      .catch(console.error)
-  }, [token])
+    if (token) fetchCategories();
+  }, [token, selectedBranch]);
 
   useEffect(() => {
-    fetchItems()
-  }, [])
+    fetchItems();
+  }, [selectedBranch]); // перезагружаем при смене филиала
 
   // Cloudinary виджет
   useEffect(() => {
     if (document.getElementById('cloudinary-widget-script')) {
-      if ((window as any).cloudinary && !cloudinaryWidgetRef.current) {
-        initWidget()
-      }
-      return
+      if ((window as any).cloudinary && !cloudinaryWidgetRef.current) initWidget();
+      return;
     }
-    const script = document.createElement('script')
-    script.id = 'cloudinary-widget-script'
-    script.src = 'https://widget.cloudinary.com/v2.0/global/all.js'
-    script.async = true
-    script.onload = () => initWidget()
-    document.body.appendChild(script)
-  }, [])
+    const script = document.createElement('script');
+    script.id = 'cloudinary-widget-script';
+    script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
+    script.async = true;
+    script.onload = () => initWidget();
+    document.body.appendChild(script);
+  }, []);
 
   const initWidget = () => {
-    if (!(window as any).cloudinary) return
+    if (!(window as any).cloudinary) return;
     cloudinaryWidgetRef.current = (window as any).cloudinary.createUploadWidget(
       {
         cloudName: CLOUD_NAME,
@@ -115,57 +115,50 @@ export default function MenuManager({ token }: { token: string }) {
       },
       (error: any, result: any) => {
         if (!error && result && result.event === 'success') {
-          setForm((prev) => ({ ...prev, image: result.info.secure_url }))
+          setForm((prev) => ({ ...prev, image: result.info.secure_url }));
         }
       }
-    )
-    setWidgetReady(true)
-  }
+    );
+    setWidgetReady(true);
+  };
 
   const openCloudinaryWidget = () => {
-    if (cloudinaryWidgetRef.current && widgetReady) {
-      cloudinaryWidgetRef.current.open()
-    } else {
-      alert(t('uploaderNotReady'))
-    }
-  }
+    if (cloudinaryWidgetRef.current && widgetReady) cloudinaryWidgetRef.current.open();
+    else alert(t('uploaderNotReady'));
+  };
 
   const resetForm = () => {
-    setForm({ name: '', description: '', price: 0, category: '', categoryKey: '', image: '' })
-    setTranslations({})
-    setSelectedCategory('')
-    setUseCustomCategory(false)
-    setCustomCategoryName('')
-    setCustomCategoryTranslations({})
-    setCategorySuggestions([])
-    setShowSuggestions(false)
-    setEditingId(null)
-    setShowForm(false)
-  }
+    setForm({ name: '', description: '', price: 0, category: '', categoryKey: '', image: '' });
+    setTranslations({});
+    setSelectedCategory('');
+    setUseCustomCategory(false);
+    setCustomCategoryName('');
+    setCustomCategoryTranslations({});
+    setCategorySuggestions([]);
+    setShowSuggestions(false);
+    setEditingId(null);
+    setShowForm(false);
+  };
 
   const updateCategoryFields = (key: string, isCustom: boolean, customName?: string) => {
     if (isCustom) {
-      setUseCustomCategory(true)
-      setSelectedCategory('')
+      setUseCustomCategory(true);
+      setSelectedCategory('');
       setForm(prev => ({
         ...prev,
         category: customName || '',
         categoryKey: customName?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '',
-      }))
+      }));
     } else {
-      setUseCustomCategory(false)
-      setSelectedCategory(key)
-      setCustomCategoryName('')
-      setForm(prev => ({
-        ...prev,
-        category: key,
-        categoryKey: key,
-      }))
+      setUseCustomCategory(false);
+      setSelectedCategory(key);
+      setCustomCategoryName('');
+      setForm(prev => ({ ...prev, category: key, categoryKey: key }));
     }
-  }
+  };
 
   const handleEdit = (item: MenuItem) => {
-    setEditingId(item._id || null)
+    setEditingId(item._id || null);
     setForm({
       name: item.name,
       description: item.description,
@@ -173,133 +166,125 @@ export default function MenuManager({ token }: { token: string }) {
       category: item.category || '',
       categoryKey: item.categoryKey || '',
       image: item.image || '',
-    })
-    setTranslations(item.translations || {})
-
-    const foundCat = categories.find(c => c.key === item.categoryKey)
-    if (foundCat) {
-      updateCategoryFields(foundCat.key, false)
-    } else if (item.categoryKey) {
-      setUseCustomCategory(true)
-      setCustomCategoryName(item.category || '')
-      setCustomCategoryTranslations(item.translations?.category as any || {})
-      setSelectedCategory('')
+    });
+    setTranslations(item.translations || {});
+    const foundCat = categories.find(c => c.key === item.categoryKey);
+    if (foundCat) updateCategoryFields(foundCat.key, false);
+    else if (item.categoryKey) {
+      setUseCustomCategory(true);
+      setCustomCategoryName(item.category || '');
+      setCustomCategoryTranslations(item.translations?.category as any || {});
+      setSelectedCategory('');
     } else {
-      const catByCategory = categories.find(c => c.key === item.category)
-      if (catByCategory) {
-        updateCategoryFields(catByCategory.key, false)
-      } else {
-        updateCategoryFields('', false)
-      }
+      const catByCategory = categories.find(c => c.key === item.category);
+      if (catByCategory) updateCategoryFields(catByCategory.key, false);
+      else updateCategoryFields('', false);
     }
-    setShowForm(true)
-  }
+    setShowForm(true);
+  };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t('deleteConfirm'))) return
+    if (!confirm(t('deleteConfirm'))) return;
     try {
       await fetch(`${apiUrl}/api/saas/menu/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
-      })
-      await fetchItems()
+      });
+      await fetchItems();
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
-  const getCategoryDisplayName = (cat: CategoryOption) =>
-  cat.translations?.[primaryLanguage] || cat.name || cat.key;
+  const getCategoryDisplayName = (cat: CategoryOption) => cat.translations?.[primaryLanguage] || cat.name || cat.key;
 
   const searchCategories = async (query: string) => {
     if (query.length < 2) {
-      setCategorySuggestions([])
-      setShowSuggestions(false)
-      return
+      setCategorySuggestions([]);
+      setShowSuggestions(false);
+      return;
     }
     try {
-      const res = await fetch(`${apiUrl}/api/saas/categories/suggest?q=${encodeURIComponent(query)}`, {
+      let url = `${apiUrl}/api/saas/categories/suggest?q=${encodeURIComponent(query)}`;
+      if (selectedBranch) url += `&branchId=${selectedBranch._id}`;
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      setCategorySuggestions(data)
-      setShowSuggestions(data.length > 0)
+      });
+      const data = await res.json();
+      setCategorySuggestions(data);
+      setShowSuggestions(data.length > 0);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
-  e.preventDefault()
+    e.preventDefault();
+    let finalCategory = form.category;
+    let finalCategoryKey = form.categoryKey;
 
-  // Вычисляем финальные значения категории локально
-  let finalCategory = form.category
-  let finalCategoryKey = form.categoryKey
+    if (useCustomCategory) {
+      const categoryKey = customCategoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      try {
+        await fetch(`${apiUrl}/api/saas/categories`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            key: categoryKey,
+            name: customCategoryName,
+            translations: customCategoryTranslations,
+            branchId: selectedBranch?._id, // передаём branchId
+          }),
+        });
+      } catch (err) {
+        console.error(t('errorSaveCategory'), err);
+      }
+      finalCategory = customCategoryName;
+      finalCategoryKey = categoryKey;
+    }
 
-  if (useCustomCategory) {
-    const categoryKey = customCategoryName
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')
+    const url = editingId ? `${apiUrl}/api/saas/menu/${editingId}` : `${apiUrl}/api/saas/menu`;
+    const method = editingId ? 'PUT' : 'POST';
+    const payload = {
+      ...form,
+      category: finalCategory,
+      categoryKey: finalCategoryKey,
+      translations,
+      branchId: selectedBranch?._id, // добавляем branchId
+    };
 
     try {
-      await fetch(`${apiUrl}/api/saas/categories`, {
-        method: 'POST',
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          key: categoryKey,
-          name: customCategoryName,
-          translations: customCategoryTranslations,
-        }),
-      })
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        await fetchItems();
+        resetForm();
+      }
     } catch (err) {
-      console.error(t('errorSaveCategory'), err)
+      console.error(err);
     }
+  };
 
-    // Используем локальные переменные — не ждём setState
-    finalCategory = customCategoryName
-    finalCategoryKey = categoryKey
-  }
+  if (loading) return <div className="text-center py-10 text-text-secondary">{t('loading')}</div>;
+  if (!selectedBranch) return <div className="text-center py-10">Выберите филиал в переключателе справа вверху</div>;
 
-  const url = editingId
-    ? `${apiUrl}/api/saas/menu/${editingId}`
-    : `${apiUrl}/api/saas/menu`
-  const method = editingId ? 'PUT' : 'POST'
-
-  const payload = {
-    ...form,
-    category: finalCategory,       // ← берём из локальных переменных
-    categoryKey: finalCategoryKey, // ← а не из form (которая ещё не обновилась)
-    translations,
-  }
-
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    })
-    if (res.ok) {
-      await fetchItems()
-      resetForm()
-    }
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-  if (loading) return <div className="text-center py-10 text-text-secondary">{t('loading')}</div>
-
-  const inputBaseClass = "w-full border border-border bg-surface-page text-text-primary p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-tertiary"
+  const inputBaseClass = "w-full border border-border bg-surface-page text-text-primary p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-tertiary";
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
+      <div className="mb-4 text-sm text-gray-500">
+        Меню для филиала: <strong>{selectedBranch.name}</strong> {selectedBranch.city && `(${selectedBranch.city})`}
+      </div>
+
       {/* Шапка */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <h2 className="text-2xl font-heading font-semibold text-text-primary">
@@ -579,5 +564,5 @@ export default function MenuManager({ token }: { token: string }) {
         </div>
       )}
     </div>
-  )
+  );
 }

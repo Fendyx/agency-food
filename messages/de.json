@@ -81,6 +81,33 @@
     "loading": "Laden...",
     "siteManagement": "Website-Verwaltung",
     "loginRequired": "Autorisierung erforderlich",
+    "branches": "Filialen",
+          "branchesPage": {
+  "title": "Filialen verwalten",
+  "addBranch": "Filiale hinzufügen",
+  "empty": "Keine Filialen vorhanden. Erstelle deine erste Filiale.",
+  "deleteConfirm": "Diese Filiale löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+  "name": "Filialname",
+  "city": "Stadt",
+  "address": "Adresse",
+  "phone": "Telefon",
+  "actions": "Aktionen",
+  "loading": "Laden..."
+},
+"branchesForm": {
+  "createTitle": "Neue Filiale erstellen",
+  "editTitle": "Filiale bearbeiten",
+  "name": "Filialname *",
+  "city": "Stadt",
+  "address": "Adresse",
+  "phone": "Telefon",
+  "email": "E-Mail",
+  "workingHours": "Öffnungszeiten",
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "saving": "Speichern...",
+  "loading": "Laden..."
+},
     "dashboardPage": {
       "loading": "Dashboard wird geladen...",
       "welcome": "Willkommen, {clientName}!",

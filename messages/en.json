@@ -82,6 +82,33 @@
     "loading": "Loading...",
     "siteManagement": "Site management",
     "loginRequired": "Authorization required",
+          "branches": "Branches",
+"branchesPage": {
+  "title": "Manage Branches",
+  "addBranch": "Add Branch",
+  "empty": "No branches yet. Create your first branch.",
+  "deleteConfirm": "Delete this branch? This action cannot be undone.",
+  "name": "Branch name",
+  "city": "City",
+  "address": "Address",
+  "phone": "Phone",
+  "actions": "Actions",
+  "loading": "Loading..."
+},
+"branchesForm": {
+  "createTitle": "Create New Branch",
+  "editTitle": "Edit Branch",
+  "name": "Branch name *",
+  "city": "City",
+  "address": "Address",
+  "phone": "Phone",
+  "email": "Email",
+  "workingHours": "Working hours",
+  "cancel": "Cancel",
+  "save": "Save",
+  "saving": "Saving...",
+  "loading": "Loading..."
+},
     "dashboardPage": {
       "loading": "Loading dashboard...",
       "welcome": "Welcome, {clientName}!",

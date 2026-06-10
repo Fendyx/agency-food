@@ -81,6 +81,33 @@
     "loading": "Ładowanie...",
     "siteManagement": "Zarządzanie stroną",
     "loginRequired": "Wymagana autoryzacja",
+    "branches": "Oddziały",
+          "branchesPage": {
+  "title": "Zarządzanie oddziałami",
+  "addBranch": "Dodaj oddział",
+  "empty": "Brak oddziałów. Utwórz pierwszy oddział.",
+  "deleteConfirm": "Usunąć ten oddział? Tej operacji nie można cofnąć.",
+  "name": "Nazwa oddziału",
+  "city": "Miasto",
+  "address": "Adres",
+  "phone": "Telefon",
+  "actions": "Akcje",
+  "loading": "Ładowanie..."
+},
+"branchesForm": {
+  "createTitle": "Dodaj nowy oddział",
+  "editTitle": "Edytuj oddział",
+  "name": "Nazwa oddziału *",
+  "city": "Miasto",
+  "address": "Adres",
+  "phone": "Telefon",
+  "email": "E-mail",
+  "workingHours": "Godziny otwarcia",
+  "cancel": "Anuluj",
+  "save": "Zapisz",
+  "saving": "Zapisywanie...",
+  "loading": "Ładowanie..."
+},
     "dashboardPage": {
       "loading": "Ładowanie panelu...",
       "welcome": "Witaj, {clientName}!",

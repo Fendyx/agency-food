@@ -1,11 +1,11 @@
 import type { SiteConfig } from './types'
 
 export const siteConfig: SiteConfig = {
-  clientName: 'Lavendel Eatery',
-  tenantId: 'lavendel-eatery',
+  clientName: 'O\'Bella Ciao',
+  tenantId: 'o-bella-ciao',
 
   theme: {
-    primary: '#8c0fd5',
+    primary: '#ff0505',
     accent: '#F1A208',
     fontHeading: 'Playfair Display',
     fontBody: 'Inter',
@@ -29,15 +29,15 @@ export const siteConfig: SiteConfig = {
   },
 
 seo: {
-  title: 'Lavendel Eatery - Bowls, Wraps & Matcha in Würzburg',
-  description: 'Genieße gesunde Bowls, frische Wraps, leckeren Kaffee und Matcha-Spezialitäten in der Lavendel Eatery. Besuche uns in Würzburg für eine köstliche Auszeit!',
+  title: 'O\'Bella Ciao - Authentische italienische Pasta, Snacks & Eis in Braunschweig',
+  description: 'Erleben Sie den echten Geschmack Italiens bei O\'Bella Ciao! Genießen Sie unsere hausgemachte Lasagne al Forno, herzhafte Snacks und erfrischende Eisgetränke. Besuchen Sie uns in Braunschweig für eine perfekte kulinarische Auszeit!',
 },
 
   menuStyle: 'grid',
   galleryStyle: 'bento',
   // === Новые поля для Hero ===
   // Для варианта 'video'
-  heroVideoUrl: '/video/restaurant_interior.mp4',
+  heroVideoUrl: '/video/italian.mp4',
   heroPosterUrl: '/video/hero-poster.jpg',
 
   // Для варианта 'slider' (3-4 изображения)

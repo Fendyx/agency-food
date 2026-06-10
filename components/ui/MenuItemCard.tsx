@@ -1,15 +1,18 @@
-import { MenuItem } from '@/types'
-import { getLocalizedName, getLocalizedDescription } from '@/lib/localization'
+'use client';
+
+import { MenuItem } from '@/types';
+import { getLocalizedName, getLocalizedDescription } from '@/lib/localization';
+import { useBranch } from '@/components/Branch/BranchContext';
 
 interface MenuItemCardProps {
-  item: MenuItem
-  mode?: 'public' | 'admin'
-  layout?: 'grid' | 'list'
-  onEdit?: (item: MenuItem) => void
-  onDelete?: (id: string) => void
-  locale?: string
-  primaryLanguage?: string
-  primaryCurrency?: string
+  item: MenuItem;
+  mode?: 'public' | 'admin';
+  layout?: 'grid' | 'list';
+  onEdit?: (item: MenuItem) => void;
+  onDelete?: (id: string) => void;
+  locale?: string;
+  primaryLanguage?: string;
+  primaryCurrency?: string;
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -20,10 +23,10 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   GBP: '£',
   CZK: 'Kč',
   CHF: 'CHF',
-}
+};
 
 function getCurrencySymbol(currencyCode?: string): string {
-  return currencyCode ? CURRENCY_SYMBOLS[currencyCode] || currencyCode : 'zł'
+  return currencyCode ? CURRENCY_SYMBOLS[currencyCode] || currencyCode : 'zł';
 }
 
 export default function MenuItemCard({
@@ -36,13 +39,13 @@ export default function MenuItemCard({
   primaryLanguage,
   primaryCurrency,
 }: MenuItemCardProps) {
+  const { selectedBranch, branches } = useBranch();
+  const showBranchBadge = branches.length > 1 && selectedBranch;
 
-  const displayName = locale && primaryLanguage
-    ? getLocalizedName(item, locale, primaryLanguage)
-    : item.name
-  const displayDescription = locale && primaryLanguage
-    ? getLocalizedDescription(item, locale, primaryLanguage)
-    : item.description
+  const displayName =
+    locale && primaryLanguage ? getLocalizedName(item, locale, primaryLanguage) : item.name;
+  const displayDescription =
+    locale && primaryLanguage ? getLocalizedDescription(item, locale, primaryLanguage) : item.description;
 
   /* ── LIST layout ─────────────────────────────────────────────── */
   if (layout === 'list') {
@@ -83,9 +86,16 @@ export default function MenuItemCard({
               />
             )}
           </div>
+
+          {/* Бейдж филиала (только если филиалов > 1) */}
+          {showBranchBadge && (
+            <div className="mt-1 text-[10px] text-gray-400 flex items-center gap-1">
+              📍 {selectedBranch.city} · {selectedBranch.name}
+            </div>
+          )}
         </div>
       </article>
-    )
+    );
   }
 
   /* ── GRID layout ─────────────────────────────────────────────── */
@@ -135,27 +145,34 @@ export default function MenuItemCard({
             />
           )}
         </div>
+
+        {/* Бейдж филиала (только если филиалов > 1) */}
+        {showBranchBadge && (
+          <div className="mt-1 text-[10px] text-gray-400 flex items-center gap-1">
+            📍 {selectedBranch.city} · {selectedBranch.name}
+          </div>
+        )}
       </div>
     </article>
-  )
+  );
 }
 
-/* ── Sub-components ──────────────────────────────────────────────── */
+/* ── Sub-components (без изменений) ──────────────────────────────── */
 function Price({ value, currency }: { value: number | string; currency?: string }) {
-  const symbol = getCurrencySymbol(currency)
+  const symbol = getCurrencySymbol(currency);
   return (
     <span className="font-heading font-bold text-primary text-lg leading-none tracking-tight">
       {value}
       <span className="text-xs font-medium opacity-70"> {symbol}</span>
     </span>
-  )
+  );
 }
 
 function Badge({ type }: { type: 'veg' | 'spicy' }) {
   const styles =
     type === 'veg'
       ? 'bg-green-50 text-green-700 border border-green-200'
-      : 'bg-red-50 text-red-700 border border-red-200'
+      : 'bg-red-50 text-red-700 border border-red-200';
 
   return (
     <span
@@ -163,7 +180,7 @@ function Badge({ type }: { type: 'veg' | 'spicy' }) {
     >
       {type === 'veg' ? '🌱 Veg' : '🌶 Spicy'}
     </span>
-  )
+  );
 }
 
 function AdminActions({
@@ -171,9 +188,9 @@ function AdminActions({
   onDelete,
   hidden,
 }: {
-  onEdit: () => void
-  onDelete: () => void
-  hidden?: boolean
+  onEdit: () => void;
+  onDelete: () => void;
+  hidden?: boolean;
 }) {
   return (
     <div
@@ -194,7 +211,7 @@ function AdminActions({
         Delete
       </button>
     </div>
-  )
+  );
 }
 
 function PlaceholderIcon() {
@@ -211,5 +228,5 @@ function PlaceholderIcon() {
       />
       <circle cx="14" cy="15" r="2" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
     </svg>
-  )
+  );
 }

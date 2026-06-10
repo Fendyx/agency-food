@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { siteConfig } from '@/site.config'
+import { useBranch } from '@/components/Branch/BranchContext'
 
 /* ─── Time slots: 12:00–22:00 every 30 min ─────────────────────── */
 const TIME_SLOTS = Array.from({ length: 21 }, (_, i) => {
@@ -18,7 +19,8 @@ type Step = 1 | 2
 
 export default function BookingForm() {
   const t = useTranslations('booking')
-  const locale = useLocale()                      // ← добавлено
+  const locale = useLocale()
+  const { selectedBranch, loading: branchLoading } = useBranch()
 
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState({
@@ -34,14 +36,28 @@ export default function BookingForm() {
 
   /* ── Submit ── */
   const handleSubmit = async () => {
+    if (!selectedBranch) {
+      alert(t('selectBranchFirst') || 'Выберите филиал в навигации')
+      return
+    }
     setStatus('loading')
     try {
+      const payload = {
+        branchId: selectedBranch._id,
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        date: form.date,
+        time: form.time,
+        guests: form.guests,
+        comment: form.comment,
+      }
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/saas/reservations?tenantId=${siteConfig.tenantId}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
+          body: JSON.stringify(payload),
         }
       )
       if (!res.ok) throw new Error()
@@ -55,7 +71,7 @@ export default function BookingForm() {
   if (status === 'success') {
     return (
       <Section>
-        <SectionHeader  title={t('title')} />
+        <SectionHeader title={t('title')} />
         <div className="max-w-md mx-auto">
           <div className="bg-surface-card border border-border rounded-2xl p-8 text-center shadow-card">
             <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center mx-auto mb-5">
@@ -84,9 +100,28 @@ export default function BookingForm() {
     )
   }
 
+  // Показываем загрузку или просим выбрать филиал
+  if (branchLoading) {
+    return (
+      <Section>
+        <SectionHeader title={t('title')} />
+        <div className="text-center py-10 text-text-secondary">Загрузка информации о филиале...</div>
+      </Section>
+    )
+  }
+
+  if (!selectedBranch) {
+    return (
+      <Section>
+        <SectionHeader title={t('title')} />
+        <div className="text-center py-10 text-text-secondary">Пожалуйста, выберите филиал в навигации, чтобы забронировать столик.</div>
+      </Section>
+    )
+  }
+
   return (
     <Section>
-      <SectionHeader  title={t('title')} />
+      <SectionHeader title={t('title')} />
 
       <div className="max-w-xl mx-auto">
         {/* ── Step indicator ── */}

@@ -3,6 +3,8 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/src/i18n/routing';
 import LayoutWrapper from '@/components/layout/LayoutWrapper';
+import { BranchProvider } from '@/components/Branch/BranchContext';
+import { siteConfig } from '@/site.config';
 import { Inter, Playfair_Display } from 'next/font/google';
 import type { Metadata } from 'next';
 
@@ -19,7 +21,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Lavendel Eatery', 
+  title: 'O\'Bella Ciao',
   description: 'Restaurant',
 };
 
@@ -34,11 +36,14 @@ export default async function LocaleLayout({
   if (!routing.locales.includes(locale as any)) notFound();
 
   const messages = await getMessages();
+  const tenantId = siteConfig.tenantId;
 
   return (
     <div className={`${inter.variable} ${playfair.variable}`}>
       <NextIntlClientProvider messages={messages}>
-        <LayoutWrapper>{children}</LayoutWrapper>
+        <BranchProvider tenantId={tenantId}>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </BranchProvider>
       </NextIntlClientProvider>
     </div>
   );
