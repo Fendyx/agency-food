@@ -21,8 +21,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'O\'Bella Ciao',
-  description: 'Restaurant',
+  title: 'ArtCafé Juhee',
+  description: 'Café',
 };
 
 export default async function LocaleLayout({

@@ -1,8 +1,8 @@
 import type { SiteConfig } from './types'
 
 export const siteConfig: SiteConfig = {
-  clientName: 'O\'Bella Ciao',
-  tenantId: 'o-bella-ciao',
+  clientName: 'ArtCafé Juhee',
+  tenantId: 'art-cafe',
 
   theme: {
     primary: '#ff0505',
@@ -29,15 +29,15 @@ export const siteConfig: SiteConfig = {
   },
 
 seo: {
-  title: 'O\'Bella Ciao - Authentische italienische Pasta, Snacks & Eis in Braunschweig',
-  description: 'Erleben Sie den echten Geschmack Italiens bei O\'Bella Ciao! Genießen Sie unsere hausgemachte Lasagne al Forno, herzhafte Snacks und erfrischende Eisgetränke. Besuchen Sie uns in Braunschweig für eine perfekte kulinarische Auszeit!',
+  title: 'ArtCafé Juhee - Dein mobiles Café für Kaffee & Snacks unterwegs',
+  description: 'Erlebe ArtCafé Juhee on the road! Wir reisen von Stadt zu Stadt und bringen dir frisch gebrühten Kaffee, leckere Snacks und süße Leckereien. Folge unserer Route und genieße eine perfekte kulinarische Auszeit, wo immer wir halten!',
 },
 
   menuStyle: 'grid',
   galleryStyle: 'bento',
   // === Новые поля для Hero ===
   // Для варианта 'video'
-  heroVideoUrl: '/video/italian.mp4',
+  heroVideoUrl: '/video/coffe-van.mp4',
   heroPosterUrl: '/video/hero-poster.jpg',
 
   // Для варианта 'slider' (3-4 изображения)
