@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import type { MenuItem } from '@/types'
 import MenuItemCard from '@/components/ui/MenuItemCard'
 import { siteConfig } from '@/site.config'
-import { useTenantSettings } from '@/lib/useTenantSettings'
+import { useBranchSettings } from '@/lib/useBranchSettings'   // ← заменили useTenantSettings
 
 interface CategoryData {
   name: string
@@ -22,9 +22,7 @@ export default function MenuLayout({ items, menuStyle }: { items: MenuItem[]; me
   const menuContainerRef = useRef<HTMLDivElement>(null)
   const t = useTranslations('menu')
   const locale = useLocale()
-  const { settings } = useTenantSettings(siteConfig.tenantId)
-  const primaryLanguage = settings?.primaryLanguage || 'pl'
-  const primaryCurrency = settings?.primaryCurrency || 'PLN'
+  const { primaryLanguage, loading: settingsLoading } = useBranchSettings()   // ← получаем язык и валюту из настроек филиала
 
   const [categoryMap, setCategoryMap] = useState<Record<string, CategoryData>>({})
 
@@ -50,7 +48,7 @@ export default function MenuLayout({ items, menuStyle }: { items: MenuItem[]; me
     const cat = categoryMap[categoryKey]
     if (!cat) return categoryKey
     if (cat.translations?.[locale]) return cat.translations[locale]
-    if (locale === primaryLanguage) return cat.name
+    if (locale === primaryLanguage) return cat.name          // ← используем primaryLanguage из филиала
     return cat.name || categoryKey
   }
 
@@ -75,6 +73,10 @@ export default function MenuLayout({ items, menuStyle }: { items: MenuItem[]; me
       }
     }
   }, [activeCategory])
+
+  if (settingsLoading) {
+    return <div className="flex justify-center py-10">Loading menu...</div>
+  }
 
   return (
     <div className="flex flex-col lg:flex-row gap-8" ref={menuContainerRef}>
@@ -129,8 +131,7 @@ export default function MenuLayout({ items, menuStyle }: { items: MenuItem[]; me
                 mode="public"
                 layout="grid"
                 locale={locale}
-                primaryLanguage={primaryLanguage}
-                primaryCurrency={primaryCurrency}
+                // primaryLanguage и primaryCurrency больше не передаём
               />
             ))}
           </div>
@@ -143,8 +144,7 @@ export default function MenuLayout({ items, menuStyle }: { items: MenuItem[]; me
                 mode="public"
                 layout="list"
                 locale={locale}
-                primaryLanguage={primaryLanguage}
-                primaryCurrency={primaryCurrency}
+                // primaryLanguage и primaryCurrency больше не передаём
               />
             ))}
           </div>

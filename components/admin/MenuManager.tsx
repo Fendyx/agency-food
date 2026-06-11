@@ -4,7 +4,7 @@ import { siteConfig } from '@/site.config';
 import MenuItemCard from '@/components/ui/MenuItemCard';
 import type { MenuItem } from '@/types';
 import { useTranslations } from 'next-intl';
-import { useTenantSettings } from '@/lib/useTenantSettings';
+import { useBranchSettings } from '@/lib/useBranchSettings';
 import { useBranch } from '@/components/Branch/BranchContext'; // добавлено
 
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'твой-cloud-name';
@@ -44,9 +44,7 @@ export default function MenuManager({ token }: { token: string }) {
   const cloudinaryWidgetRef = useRef<any>(null);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const { settings } = useTenantSettings(siteConfig.tenantId);
-  const primaryLanguage = settings?.primaryLanguage || 'pl';
-  const primaryCurrency = settings?.primaryCurrency || 'PLN';
+  const { primaryLanguage, primaryCurrency, loading: settingsLoading } = useBranchSettings();
   const SUPPORTED_LANGUAGES = ['pl', 'en', 'de', 'ru', 'es', 'ua'];
   const availableLangs = useMemo(() => SUPPORTED_LANGUAGES.filter(lang => lang !== primaryLanguage), [primaryLanguage]);
 
@@ -274,7 +272,7 @@ export default function MenuManager({ token }: { token: string }) {
     }
   };
 
-  if (loading) return <div className="text-center py-10 text-text-secondary">{t('loading')}</div>;
+  if (loading || settingsLoading) return <div className="text-center py-10 text-text-secondary">{t('loading')}</div>;
   if (!selectedBranch) return <div className="text-center py-10">Выберите филиал в переключателе справа вверху</div>;
 
   const inputBaseClass = "w-full border border-border bg-surface-page text-text-primary p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-tertiary";
@@ -556,7 +554,6 @@ export default function MenuManager({ token }: { token: string }) {
               key={item._id}
               item={item}
               mode="admin"
-              primaryCurrency={primaryCurrency}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />

@@ -3,6 +3,7 @@
 import { MenuItem } from '@/types';
 import { getLocalizedName, getLocalizedDescription } from '@/lib/localization';
 import { useBranch } from '@/components/Branch/BranchContext';
+import { useBranchSettings } from '@/lib/useBranchSettings';
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -11,8 +12,6 @@ interface MenuItemCardProps {
   onEdit?: (item: MenuItem) => void;
   onDelete?: (id: string) => void;
   locale?: string;
-  primaryLanguage?: string;
-  primaryCurrency?: string;
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -36,16 +35,21 @@ export default function MenuItemCard({
   onEdit,
   onDelete,
   locale,
-  primaryLanguage,
-  primaryCurrency,
 }: MenuItemCardProps) {
   const { selectedBranch, branches } = useBranch();
+  const { primaryLanguage, primaryCurrency, loading: settingsLoading } = useBranchSettings();
   const showBranchBadge = branches.length > 1 && selectedBranch;
 
-  const displayName =
-    locale && primaryLanguage ? getLocalizedName(item, locale, primaryLanguage) : item.name;
-  const displayDescription =
-    locale && primaryLanguage ? getLocalizedDescription(item, locale, primaryLanguage) : item.description;
+  if (settingsLoading) {
+    return <div className="h-48 bg-surface-hover animate-pulse rounded-2xl" />;
+  }
+
+  const displayName = locale && primaryLanguage
+    ? getLocalizedName(item, locale, primaryLanguage)
+    : item.name;
+  const displayDescription = locale && primaryLanguage
+    ? getLocalizedDescription(item, locale, primaryLanguage)
+    : item.description;
 
   /* ── LIST layout ─────────────────────────────────────────────── */
   if (layout === 'list') {
